@@ -4,7 +4,7 @@ using namespace std;
 
 int main(){
 	string format;
-	string tracking = "";
+	string tracking = "PLEASE_TYPE_A_FILENAME_BEFORE_YOUR_FIRST_SAVE";
 	string buffer[50];
 	int limit = 0;
 	ofstream fout;
@@ -17,12 +17,15 @@ int main(){
 		}else if (s[0] == '/'){//command
 			string sa = s.substr(1, 4);
 			if (sa == "SAVE"){
-				string filename = s.substr(6, s.size() - 5);
-				if (filename != "") tracking = filename;
-				fout.open(tracking + ".txt");
+				if (s.size() > 6){
+					string filename = s.substr(6, s.size() - 5);
+					tracking = filename;
+				}
+				fout.open(tracking + ".txt", ios_base::app);
 				for (int i = 0; i < limit; i++){
 					fout << buffer[i] << endl;
 				}
+				limit = 0;
 				fout.flush();
 				fout.close();
 			}
@@ -31,6 +34,6 @@ int main(){
 		}else{
 			buffer[limit++] = format + s;
 		}
-		cin >> s;
+		getline(cin, s);
 	}
 }
