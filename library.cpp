@@ -44,7 +44,7 @@ void del(){
 		if (!cmdError){
 			int pos = stoi(sub);
 			if (pos < 0){
-				buffer.erase(buffer.begin() + bufferIterator - pos);
+				buffer.erase(buffer.end() + pos - 1);
 				bufferIterator--;
 			}else{
 				buffer.erase(buffer.begin() + pos);
