@@ -17,6 +17,14 @@ void commandSyntaxError(){
 	cmdError = 0;
 }
 
+string ordinal(int n){
+	if (n % 100 >= 11 && n % 100 <= 13) return "th";
+	else if (n % 10 == 1) return "st";
+	else if (n % 10 == 2) return "nd";
+	else if (n % 10 == 3) return "rd";
+	else return "th";
+}
+
 void save(){
 	if (s.size() > 6){
 		string filename = s.substr(6, s.size() - 5);
@@ -31,11 +39,20 @@ void save(){
 	buffer.clear();
 	fout.flush();
 	fout.close();
+
+	cout << "Saved to " << tracking << ".txt." << endl;
+}
+
+stack<pair<string, int>> undoStack;
+void undo(){
+	
 }
 
 void del(){
 	if (s.size() < 6){
 		buffer.pop_back();
+		bufferIterator--;
+		cout << "Deleted last input." << endl;
 	}else{
 		string sub = s.substr(5, s.size() - 5);
 		int subs = sub.size();
@@ -44,10 +61,18 @@ void del(){
 		if (!cmdError){
 			int pos = stoi(sub);
 			if (pos < 0){
-				buffer.erase(buffer.end() + pos - 1);
+				int ord = buffer.size() + pos + 1; 
+				buffer.erase(buffer.end() + pos);
 				bufferIterator--;
+
+				cout << "Deleted " << ord << ordinal(ord) << " input." << endl;
+
 			}else{
+				int ord = pos + 1;
 				buffer.erase(buffer.begin() + pos);
+				bufferIterator--;
+
+				cout << "Deleted " << ord << ordinal(ord) << " input." << endl;
 			}
 		}
 	}
@@ -60,7 +85,25 @@ void changeLimit(){
 		int subs = sub.size();
 		for (int i = 0; i < subs; i++) if (!(sub[i] >= '0' && sub[i] <= '9')) cmdError = 1;
 
-		if (!cmdError) limit = stoi(sub);
+		if (!cmdError){
+			limit = stoi(sub);
+			cout << "Changed limit to " << limit << "." << endl;
+		}
+	}
+}
+
+void clear(){
+	cout << "Are you sure to clear the undo stack? Type \"Y\" to confirm. ";
+	char c;
+	cin >> c;
+	if (c == 'Y'){
+		int sts = undoStack.size() - 1;
+		while (sts-- >= 0){
+			undoStack.pop();
+		}
+		cout << "Undo stack cleared." << endl;
+	}else{
+		cout << "Clear command failed to execute." << endl;
 	}
 }
 
@@ -86,6 +129,9 @@ void commandHandling(){
 	//limit
 	cmd = toUpper(s.substr(1, 5));
 	if (cmd == "LIMIT") changeLimit();
+
+	//clear
+	if (cmd == "CLEAR") clear();
 
 	if (cmdError){
 		commandSyntaxError();
