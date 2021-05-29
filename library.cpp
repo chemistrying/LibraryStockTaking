@@ -99,7 +99,7 @@ int main(){
 			format = s.substr(1, s.size() - 2);
 		}else if (s[0] == '/'){//command
 			commandHandling();
-		}else if (bufferIterator == limit){
+		}else if (bufferIterator >= limit){
 			cout << "Buffer reached maximum. Please save before entering more data." << endl;
 		}else{
 			buffer.push_back(format + s);
