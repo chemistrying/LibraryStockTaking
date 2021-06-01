@@ -3,12 +3,15 @@
 using namespace std;
 
 string format;
+string format_back;
 string tracking = "PLEASE_TYPE_A_FILENAME_BEFORE_YOUR_FIRST_SAVE";
 vector<string> buffer;
 int limit = 50;
 int bufferIterator = 0;
+ifstream fin;
 ofstream fout;
 string s;
+stack<pair<string, int>> undoStack;
 
 bool cmdError = 0;
 
@@ -25,12 +28,16 @@ string ordinal(int n){
 	else return "th";
 }
 
+string toUpper(string str){
+	int ss = s.size();
+	for (int i = 0; i < ss; i++) if (str[i] >= 'a' && str[i] <= 'z') str[i] -= 32;
+	return str;
+}
+
 void save(){
 	if (s.size() > 6){
 		string filename = s.substr(6, s.size() - 5);
 		tracking = filename;
-	}else{
-		cmdError = 1;
 	}
 	fout.open(tracking + ".txt", ios_base::app);
 	for (int i = 0; i < buffer.size(); i++){
@@ -43,7 +50,7 @@ void save(){
 	cout << "Saved to " << tracking << ".txt." << endl;
 }
 
-stack<pair<string, int>> undoStack;
+
 void undo(){
 	
 }
@@ -107,10 +114,21 @@ void clear(){
 	}
 }
 
-string toUpper(string str){
-	int ss = s.size();
-	for (int i = 0; i < ss; i++) if (str[i] >= 'a' && str[i] <= 'z') str[i] -= 32;
-	return str;
+void count(){
+  	if (s.size() < 8) cmdError = 1;
+  	else{
+    	string sub = s.substr(7, s.size() - 7);
+    	int subs = sub.size();
+		fin.open(subs + ".txt");
+		int cnt = 0;
+		while (!fin.eof()){
+			string _;
+			getline(fin, _);
+			cnt++;
+		}
+		cout << cnt << endl;
+		fin.close();
+  	}
 }
 
 void commandHandling(){
@@ -133,22 +151,35 @@ void commandHandling(){
 	//clear
 	if (cmd == "CLEAR") clear();
 
+  	if (cmd == "COUNT") count();
+
 	if (cmdError){
 		commandSyntaxError();
+	}
+}
+
+void formatChange(){
+	int pos = s.find('*');
+	if (pos != -1){
+		format = s.substr(1, pos - 1);
+		format_back = s.substr(pos + 1, s.size() - pos - 1);
+	}else{
+		format = s.substr(1, s.size() - 1);
+		format_back = "";
 	}
 }
 
 int main(){
     getline(cin, s); //fin >> s;
 	while(s != "END"){ //!fin.eof() 
-		if (s[0] == '['){
-			format = s.substr(1, s.size() - 2);
+		if (s[0] == ';'){
+			formatChange();
 		}else if (s[0] == '/'){//command
 			commandHandling();
 		}else if (bufferIterator >= limit){
 			cout << "Buffer reached maximum. Please save before entering more data." << endl;
 		}else{
-			buffer.push_back(format + s);
+			buffer.push_back(format + s + format_back);
 			bufferIterator++;
 		}
 		getline(cin, s);
