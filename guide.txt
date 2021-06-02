@@ -1,3 +1,0 @@
------Basic Command-----
-    [input]: input data to the system. Note: It will not immediately 
-    ;[format]: 
