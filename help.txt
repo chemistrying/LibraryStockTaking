@@ -41,7 +41,8 @@ Long Long: -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807
                             Note: Flushed inputs (or Saved inputs) is irrecoverable.
                             Note: Position is zero-based, meaning the index of the first element is 0.
                             NOTE: INPUTING AN INTEGER LARGER THAN THE NUMBER OF ELEMENTS IN THE SYSTEM WILL CAUSE ERROR, AND UNEXPECTED ERRORS MAY OCCUR.
-    /undo                   (will be implemented later)
+    /undo                   Undo last delete operation.
+                            Only support undoing delete function.
     /redo                   (will be implemented later)
     /count {filename}       Count the number of inputs in the file.
                             The function will automatically quit when the time limit is exceeded or it reaches end of file character.
