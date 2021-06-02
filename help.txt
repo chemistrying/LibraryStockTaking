@@ -37,6 +37,7 @@ Long Long: -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807
                             You may specify a certain position of input. 
                             Negative integers will delete nth last input.
                             Positive integers will delete nth input.
+                            Supports undo command.
                             Note: Flushed inputs (or Saved inputs) is irrecoverable.
                             Note: Position is zero-based, meaning the index of the first element is 0.
                             NOTE: INPUTING AN INTEGER LARGER THAN THE NUMBER OF ELEMENTS IN THE SYSTEM WILL CAUSE ERROR, AND UNEXPECTED ERRORS MAY OCCUR.
