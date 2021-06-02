@@ -3,6 +3,7 @@
 ## Current Stable Releases:
 
 **library_alpha.exe**
+
 **library_beta_v5.exe**
 
 ## Alpha Guide:
