@@ -2,7 +2,7 @@
 
 ## Current Releases:
 
-*library_alpha.exe*
+**library_alpha.exe**
 
 ## Alpha Guide:
 
