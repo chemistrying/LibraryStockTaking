@@ -3,6 +3,7 @@
         "cmath": "cpp",
         "fstream": "cpp",
         "algorithm": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "tuple": "cpp"
     }
 }
