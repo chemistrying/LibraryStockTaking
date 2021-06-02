@@ -1,6 +1,6 @@
 # LibraryInventoryCheck
 
-## Current Releases:
+## Current Stable Releases:
 
 **library_alpha.exe**
 
