@@ -6,13 +6,15 @@
 
 **library_beta_v5.exe**
 
-## Alpha Guide:
+Note: All executables MUST be run in Windows Machine.
+
+## Alpha to Beta_v4:
 
 1. Type the format.
 2. Input data.
 3. Type END to save the data with format.
 
-## Beta_v5 Guide:
+## Beta_v5 or above:
 
 1. Type /help for help.
 
