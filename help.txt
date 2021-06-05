@@ -51,7 +51,7 @@ Long Long: -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807
     /redo                   (will be implemented later)
     /count {fileLocation}   Count the number of inputs in the file.
                             The function will automatically quit when the time limit is exceeded or it reaches end of file character.
-                            The time limit is 5 seconds.
+                            The time limit is 2 seconds.
 
 -----Advanced Commands-----
     /clear                  Clears the undo stack, which may run faster after clearing the stack.
