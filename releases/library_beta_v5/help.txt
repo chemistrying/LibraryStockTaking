@@ -1,0 +1,50 @@
+Guide of the Guide of the Program:
+
+Words in [] means they can be typed with exact wording.
+For example: /test [0|1|2] means you can type either /test or /test 0 or /test 1 or /test 2. 
+
+Words in {} means they are parameters.
+For exmaple: /test {integer} means you can type an integer behind /test, like /test -13 or /test 10000.
+
+Note:
+Integer: -2,147,483,648 to 2,147,483,647
+Long Long: -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807
+
+-----Basic Command-----
+    {input}                 Input data to the system. 
+                            Note: It will not be immediately flushed to the target file.
+    ;{format}               Change the format of the data.
+                            Leaving [format] blank equals no format. 
+                            For exmaple: ;C10 will automatically add "C10" in front of the input.
+                            Adding a '*' character into the format will cause the format to be splitted.
+                            For exmaple: ;3*.01 will automatically add "3" in front of the input and add ".01" after the input.
+                            Default format is "".
+    END                     Exit the program.
+                            Note: All characters must be capitalized.
+                            NOTE: ALL UNSAVED INPUTS WILL BE ERADICATED, PLEASE SAVE BEFORE YOU EXIT THE PROGRAM.
+    /help [basic|advanced]  Open this text.
+    /save {filename}        Save the input to target file location. 
+                            Leaving the filename blank will save to the last specified file location.
+                            Default file name is PLEASE_TYPE_A_FILENAME_BEFORE_YOUR_FIRST_SAVE.
+                            Note: You don't have to input .txt when saving.
+                            NOTE: SAVE COMMAND CANNOT BE UNDONE. PLEASE CONFIRM TWICE TO SEE IF YOU FILENAME IS CORRECT.
+    /limit {integer}        Change the buffer limit of the program.
+                            This reduces the losses of your data when the program is crashed or errors are occured.
+                            Default value is 50.
+                            NOTE: SETTING LIMIT NOT GREATER THAN 0 WILL BLOCK ANY INPUT.
+    /del {integer}          Delete input.
+                            Leaving integer blank will automatically delete last input.
+                            You may specify a certain position of input. 
+                            Negative integers will delete nth last input.
+                            Positive integers will delete nth input.
+                            Supports undo command.
+                            Note: Flushed inputs (or Saved inputs) is irrecoverable.
+                            Note: Position is zero-based, meaning the index of the first element is 0.
+                            NOTE: INPUTING AN INTEGER LARGER THAN THE NUMBER OF ELEMENTS IN THE SYSTEM WILL CAUSE ERROR, AND UNEXPECTED ERRORS MAY OCCUR.
+    /undo                   Undo last delete operation.
+                            Only support undoing delete function.
+    /redo                   (will be implemented later)
+    /count {filename}       Count the number of inputs in the file.
+                            The function will automatically quit when the time limit is exceeded or it reaches end of file character.
+                            The time limit is 5 seconds.
+    
