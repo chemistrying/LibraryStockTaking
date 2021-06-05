@@ -10,7 +10,7 @@ Note:
 Integer: -2,147,483,648 to 2,147,483,647
 Long Long: -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807
 
------Basic Command-----
+-----Basic Commands-----
     {input}                 Input data to the system. 
                             Note: It will not be immediately flushed to the target file.
     ;{format}               Change the format of the data.
@@ -47,4 +47,6 @@ Long Long: -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807
     /count {filename}       Count the number of inputs in the file.
                             The function will automatically quit when the time limit is exceeded or it reaches end of file character.
                             The time limit is 5 seconds.
-    
+
+-----Advanced Commands-----
+    /clear                  Clears the undo stack, which may run faster after clearing the stack.
