@@ -8,11 +8,16 @@
 
 Note: All executables MUST be run in Windows Machine.
 
-## Alpha to Beta_v4:
+## Alpha:
 
 1. Type the format.
 2. Input data.
 3. Type END to save the data with format.
+
+## Beta:
+
+Will be updated later.
+
 
 ## Beta_v5 or above:
 
