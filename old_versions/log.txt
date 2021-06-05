@@ -10,4 +10,7 @@ beta_v3:    added '*' to format changing
 beta_v4:    added count function for files with time limit 
             added help function to guide people using it
 beta_v5:    added undo function (which is a big thing)
+beta_v6:    explicitly added clear function
+            added basic and advanced parameters for help function
+            changed time limit of count function from 5 seconds to 2 seconds
 
