@@ -77,7 +77,7 @@ void help(){
 			cout << str << endl;
 		}
 	}else{
-		string subs = toUpper(s.substr(7, s.size() - 7));
+		string subs = toUpper(s.substr(6, s.size() - 6));
 		if (subs == "BASIC"){
 			int line = 1;
 			fin.open("help.txt");
