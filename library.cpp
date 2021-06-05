@@ -13,6 +13,7 @@ ofstream fout;
 string s;
 stack<tuple<string, int, string>> undoStack;
 int basicLine = 49;
+int timeLimit = 2;
 
 bool cmdError = 0;
 bool tle = 0;
@@ -190,7 +191,7 @@ void count(){
 		fin.open(sub + ".txt");
 		int cnt = 0;
 		while (!fin.eof()){
-			if (currentTime - originalTime > 5){
+			if (currentTime - originalTime > timeLimit){
 				tle = 1;
 				break;
 			}
