@@ -23,9 +23,14 @@ Long Long: -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807
                             Note: All characters must be capitalized.
                             NOTE: ALL UNSAVED INPUTS WILL BE ERADICATED, PLEASE SAVE BEFORE YOU EXIT THE PROGRAM.
     /help [basic|advanced]  Open this text.
-    /save {filename}        Save the input to target file location. 
-                            Leaving the filename blank will save to the last specified file location.
-                            Default file name is PLEASE_TYPE_A_FILENAME_BEFORE_YOUR_FIRST_SAVE.
+    /save {fileLocation}    Save the input to target file location. 
+                            Leaving the fileLocation blank will save to the last specified file location.
+                            Default fileLocation is PLEASE_TYPE_A_FILENAME_BEFORE_YOUR_FIRST_SAVE.
+                            Inputing only filename will save in current folder.
+                            You may use ../ in front of the filename to save to upper directories.
+                            You may also do {foldername}/{filename} to save to lower directories.
+                            You may also specify the exact file location.
+                            Note: It is recommended to experiment these stuff by yourself.
                             Note: You don't have to input .txt when saving.
                             NOTE: SAVE COMMAND CANNOT BE UNDONE. PLEASE CONFIRM TWICE TO SEE IF YOU FILENAME IS CORRECT.
     /limit {integer}        Change the buffer limit of the program.
@@ -44,7 +49,7 @@ Long Long: -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807
     /undo                   Undo last delete operation.
                             Only support undoing delete function.
     /redo                   (will be implemented later)
-    /count {filename}       Count the number of inputs in the file.
+    /count {fileLocation}   Count the number of inputs in the file.
                             The function will automatically quit when the time limit is exceeded or it reaches end of file character.
                             The time limit is 5 seconds.
 
