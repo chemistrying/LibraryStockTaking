@@ -14,9 +14,19 @@ string s;
 stack<tuple<string, int, string>> undoStack;
 int basicLine = 49;
 int timeLimit = 2;
+string version = "beta_v7";
 
 bool cmdError = 0;
 bool tle = 0;
+
+void systemMessage(){
+	fin.open("systemMessage.txt");
+	do{
+		getline(fin, s);
+		cout << s << endl;
+	}while (!fin.eof());
+	fin.close();
+}
 
 void commandSyntaxError(){
 	cout << "Syntax Error: Please retype the command again." << endl;
@@ -261,6 +271,7 @@ void formatChange(){
 }
 
 int main(){
+	systemMessage();
     getline(cin, s); //fin >> s;
 	while(s != "END"){ //!fin.eof() 
 		if (s[0] == ';'){
