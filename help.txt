@@ -14,7 +14,7 @@ Long Long: -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807
     {input}                 Input data to the system. 
                             Note: It will not be immediately flushed to the target file.
     ;{format}               Change the format of the data.
-                            Leaving [format] blank equals no format. 
+                            Leaving {format} blank equals no format. 
                             For exmaple: ;C10 will automatically add "C10" in front of the input.
                             Adding a '*' character into the format will cause the format to be splitted.
                             For exmaple: ;3*.01 will automatically add "3" in front of the input and add ".01" after the input.
