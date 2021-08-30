@@ -1,4 +1,10 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <string>
+#include <stack>
+#include <vector>
+#include <tuple>
+#include <fstream>
+#include <time.h>
 
 using namespace std;
 
@@ -6,15 +12,14 @@ string format;
 string format_back;
 string tracking = "PLEASE_TYPE_A_FILENAME_BEFORE_YOUR_FIRST_SAVE";
 vector<string> buffer;
-int limit = 50;
+int limit = 50; //buffer limiting
 int bufferIterator = 0;
 ifstream fin;
 ofstream fout;
-string s;
+string s; //main input string
 stack<tuple<string, int, string>> undoStack;
-int basicLine = 49;
+int basicLine = 49; //controlling the output amount of /help
 int timeLimit = 2;
-string version = "beta_v7";
 
 bool cmdError = 0;
 bool tle = 0;
@@ -57,11 +62,22 @@ void save(){
 		string filename = s.substr(6, s.size() - 5);
 		tracking = filename;
 	}
+
+	do{
+		cout << "Confirm saving into \"" << tracking << ".txt\" this file? [Y|N] ";
+		getline(cin, s);
+	}while (s != "Y" && s != "N");
+
+	if (s == "N"){
+		cout << "Save operation stopped." << endl;
+		return;
+	}
+
+
 	fout.open(tracking + ".txt", ios_base::app);
 	for (int i = 0; i < buffer.size(); i++){
 		fout << buffer[i] << endl;
 	}
-	buffer.clear();
 	fout.flush();
 	fout.close();
 
