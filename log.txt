@@ -1,6 +1,9 @@
 v1.0
-    Simple Formatting
+    Simple formatting
     Really minimalistic program
     Supports one format only per one program run
+
+v1.0.1
+    Fix typo of log.txt
 
 
