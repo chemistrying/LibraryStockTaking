@@ -1,4 +1,4 @@
-v0.1
+v1.0
     Simple Formatting
     Really minimalistic program
     Supports one format only per one program run
