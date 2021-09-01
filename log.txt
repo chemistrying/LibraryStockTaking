@@ -3,9 +3,6 @@ v1.0
     Really minimalistic program
     Supports one format only per one program run
 
-v1.0.1
-    Fix typo of log.txt
-
 v1.1
     Provides multiple formatting in one program run
     Limits users to input 50 inputs only unless it is saved to a file
