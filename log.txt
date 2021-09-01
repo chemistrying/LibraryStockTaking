@@ -1,0 +1,6 @@
+v0.1
+    Simple Formatting
+    Really minimalistic program
+    Supports one format only per one program run
+
+

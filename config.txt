@@ -1,4 +1,0 @@
-limit = 
-basicLine = 
-timeLimit = 
-autosave = 
