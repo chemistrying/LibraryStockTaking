@@ -17,3 +17,6 @@ v1.2
 
 v1.3
     Counts the number of books in a file
+
+v1.3.1
+    Improve count function by setting time limit
