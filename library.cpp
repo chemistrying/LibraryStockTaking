@@ -14,10 +14,16 @@ string s;
 stack<pair<string, int>> undoStack;
 
 bool cmdError = 0;
+bool tle = 0;
 
 void commandSyntaxError(){
-	cout << "Syntax Error: Pleas retype the command again." << endl;
+	cout << "Syntax Error: Please retype the command again." << endl;
 	cmdError = 0;
+}
+
+void timeLimitExceedError(){
+	cout << "Time Limit Exceeded: Please double check if your parameters are correctly typed." << endl;
+	tle = 0;
 }
 
 string ordinal(int n){
@@ -53,6 +59,15 @@ void save(){
 
 void undo(){
 	
+}
+
+void help(){
+	fin.open("help.txt");
+	while (!fin.eof()){
+		string str;
+		getline(fin, str);
+		cout << str << endl;
+	}
 }
 
 void del(){
@@ -117,16 +132,26 @@ void clear(){
 void count(){
   	if (s.size() < 8) cmdError = 1;
   	else{
+		time_t originalTime;
+		time_t currentTime;
+		time(&originalTime);
+		time(&currentTime);
     	string sub = s.substr(7, s.size() - 7);
     	int subs = sub.size();
-		fin.open(subs + ".txt");
+		fin.open(sub + ".txt");
 		int cnt = 0;
 		while (!fin.eof()){
+			if (currentTime - originalTime > 5){
+				tle = 1;
+				break;
+			}
 			string _;
 			getline(fin, _);
-			cnt++;
+			if (_ != "") cnt++;
+			time(&currentTime);
 		}
-		cout << cnt << endl;
+		if (!tle) cout << cnt << endl;
+		else timeLimitExceedError();
 		fin.close();
   	}
 }
@@ -140,6 +165,9 @@ void commandHandling(){
 	//undo
 	if (cmd == "UNDO");
 
+	//help
+	if (cmd == "HELP") help();
+
 	//delete
 	cmd = toUpper(s.substr(1, 3));
 	if (cmd == "DEL") del();
@@ -151,7 +179,11 @@ void commandHandling(){
 	//clear
 	if (cmd == "CLEAR") clear();
 
+	//count
   	if (cmd == "COUNT") count();
+
+	
+	if (cmd == "CONFIG") ;
 
 	if (cmdError){
 		commandSyntaxError();
