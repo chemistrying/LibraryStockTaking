@@ -11,7 +11,7 @@ int bufferIterator = 0;
 ifstream fin;
 ofstream fout;
 string s;
-stack<pair<string, int>> undoStack;
+stack<tuple<string, int, string>> undoStack;
 
 bool cmdError = 0;
 bool tle = 0;
@@ -58,7 +58,13 @@ void save(){
 
 
 void undo(){
-	
+	if (get<0>(undoStack.top()) == "del"){
+		buffer.insert(buffer.begin() + get<1>(undoStack.top()), get<2>(undoStack.top()));
+		undoStack.pop();
+
+		bufferIterator++;
+		cout << "Undo last delete operation." << endl;
+	}
 }
 
 void help(){
@@ -72,6 +78,9 @@ void help(){
 
 void del(){
 	if (s.size() < 6){
+		//undo
+		undoStack.push(make_tuple("del", buffer.size() - 1, buffer[buffer.size() - 1]));
+
 		buffer.pop_back();
 		bufferIterator--;
 		cout << "Deleted last input." << endl;
@@ -83,6 +92,9 @@ void del(){
 		if (!cmdError){
 			int pos = stoi(sub);
 			if (pos < 0){
+				//undo
+				undoStack.push(make_tuple("del", buffer.size() + pos, buffer[buffer.size() + pos]));
+
 				int ord = buffer.size() + pos + 1; 
 				buffer.erase(buffer.end() + pos);
 				bufferIterator--;
@@ -90,6 +102,9 @@ void del(){
 				cout << "Deleted " << ord << ordinal(ord) << " input." << endl;
 
 			}else{
+				//undo
+				undoStack.push(make_tuple("del", pos, buffer[pos]));
+
 				int ord = pos + 1;
 				buffer.erase(buffer.begin() + pos);
 				bufferIterator--;
@@ -101,7 +116,7 @@ void del(){
 }
 
 void changeLimit(){
-	if (s.size() < 8) cmdError = 1;//8
+	if (s.size() < 8) cmdError = 1;
 	else{
 		string sub = s.substr(7, s.size() - 7);
 		int subs = sub.size();
@@ -156,21 +171,30 @@ void count(){
   	}
 }
 
+void config(){
+	if (s.size() < 9) cmdError = 1;
+	else{
+		string subs = s.substr(8, s.size() - 8);
+
+	}
+}
+
 void commandHandling(){
 	string cmd;
+
+	//delete 
+	cmd = toUpper(s.substr(1, 3));
+	if (cmd == "DEL") del();
+
 	//save
 	cmd = toUpper(s.substr(1, 4));
 	if (cmd == "SAVE") save();
 
 	//undo
-	if (cmd == "UNDO");
+	if (cmd == "UNDO") undo();
 
 	//help
 	if (cmd == "HELP") help();
-
-	//delete
-	cmd = toUpper(s.substr(1, 3));
-	if (cmd == "DEL") del();
 
 	//limit
 	cmd = toUpper(s.substr(1, 5));
@@ -182,7 +206,7 @@ void commandHandling(){
 	//count
   	if (cmd == "COUNT") count();
 
-	
+	cmd = toUpper(s.substr(1, 6));
 	if (cmd == "CONFIG") ;
 
 	if (cmdError){
