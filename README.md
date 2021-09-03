@@ -6,3 +6,4 @@ Features of the program:<br/>
 * Allows deletion of inputs and undo deletions
 * Counts the number of books in a file
 * Clear guides
+* Checks inputs using a booklist predefined by users
