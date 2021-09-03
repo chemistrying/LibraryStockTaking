@@ -417,4 +417,7 @@ int main(){
 /*
 Added:
 Undo Error
+Checking Function
+Bugs needed to fix:
+Trailing '\n'
 */
