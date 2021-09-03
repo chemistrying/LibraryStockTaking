@@ -15,4 +15,5 @@ v1.2
     Users can now change the number of inputs limited by the system
     Syntax errors will be shown by the system
 
-
+v1.3
+    Counts the number of books in a file
