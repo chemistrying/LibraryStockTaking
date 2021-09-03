@@ -33,3 +33,6 @@ v1.4.1
 v1.4.2
     Add confirmation when saving a file
     Cut unnecessary header files
+
+v1.5
+    Checks files inputs by importing booklist into the program to ensure that it is correctly input
