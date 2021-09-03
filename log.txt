@@ -25,3 +25,7 @@ v1.3.1
 v1.4
     Able to undo deletion now (yes only deletion)
     Add help function to help and guide users
+    Supports clearing the undo stack
+
+v1.4.1
+    Classified commands into "Basic" and "Advanced"
