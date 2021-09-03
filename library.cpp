@@ -12,6 +12,8 @@ ifstream fin;
 ofstream fout;
 string s;
 stack<tuple<string, int, string>> undoStack;
+int basicLine = 49;
+int timeLimit = 2;
 
 bool cmdError = 0;
 bool tle = 0;
@@ -68,12 +70,45 @@ void undo(){
 }
 
 void help(){
-	fin.open("help.txt");
-	while (!fin.eof()){
-		string str;
-		getline(fin, str);
-		cout << str << endl;
+	if (s.size() < 7){
+		fin.open("help.txt");
+		while (!fin.eof()){
+			string str;
+			getline(fin, str);
+			cout << str << endl;
+		}
+	}else{
+		string subs = toUpper(s.substr(6, s.size() - 6));
+		if (subs == "BASIC"){
+			int line = 1;
+			fin.open("help.txt");
+			while (line <= basicLine){
+				string str;
+				getline(fin, str);
+				cout << str << endl;
+				line++;
+			}
+		}else if (subs == "ADVANCED"){
+			fin.open("help.txt");
+			int line = 1;
+			while (!fin.eof()){
+				if (line <= 12 || line >= basicLine + 2){
+					string str;
+					getline(fin, str);
+					cout << str << endl;
+				}
+				line++;
+			}
+		}else{
+			fin.open("help.txt");
+			while (!fin.eof()){
+				string str;
+				getline(fin, str);
+				cout << str << endl;
+			}
+		}
 	}
+	fin.close();
 }
 
 void del(){
@@ -156,7 +191,7 @@ void count(){
 		fin.open(sub + ".txt");
 		int cnt = 0;
 		while (!fin.eof()){
-			if (currentTime - originalTime > 5){
+			if (currentTime - originalTime > timeLimit){
 				tle = 1;
 				break;
 			}
