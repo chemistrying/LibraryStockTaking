@@ -24,10 +24,12 @@ stack<tuple<string, int, string>> undoStack; //operation, position, value
 string defaultFileLocation = "booklist";
 int basicLine = 49; //controlling the output amount of /help
 int timeLimit = 2;
+int showAllBooksPosition = 2;
+
 bool cmdError = 0;
 bool tle = 0;
 bool preload = 1;
-bool showAllBooksPosition = 1;
+
 
 void systemMessage(){
 	fin.open("systemMessage.txt");
@@ -72,30 +74,30 @@ int bs(int left, int right, vector<pair<string, int>> v, string val){
 }
 
 vector<pair<string, int>> loadBooklist(string file){
-  fin.open(file + ".txt");
-  time_t originalTime;
+  	fin.open(file + ".txt");
+  	time_t originalTime;
 	time_t currentTime;
 	time(&originalTime);
 	time(&currentTime);
-  vector<pair<string, int>> internalBooklist;
-  int it = 1;
-  while (!fin.eof()){
-    if (currentTime - originalTime > timeLimit){
-      tle = 1;
-      break;
-    }
-    string _;
-    getline(fin, _);
-    internalBooklist.push_back(make_pair(_, it++));
-    time(&currentTime);
-  }
-  if (tle){
-    timeLimitExceedError();
-  }else{
-    sort(internalBooklist.begin(), internalBooklist.end());
-  }
-  fin.close();
-  return internalBooklist;
+	vector<pair<string, int>> internalBooklist;
+	int it = 1;
+	while (!fin.eof()){
+		if (currentTime - originalTime > timeLimit){
+			tle = 1;
+			break;
+		}
+		string _;
+		getline(fin, _);
+		internalBooklist.push_back(make_pair(_, it++));
+		time(&currentTime);
+	}
+	if (tle){
+		timeLimitExceedError();
+	}else{
+		sort(internalBooklist.begin(), internalBooklist.end());
+	}
+	fin.close();
+	return internalBooklist;
 }
 
 void save(){
@@ -284,32 +286,38 @@ void config(){
 
 
 void smallCheck(string file, vector<pair<string, int>> v){
+	bool ok = 0;
   	fin.open(file + ".txt");
   	time_t originalTime, currentTime;
   	time(&originalTime);
   	time(&currentTime);
   	while (!fin.eof()){
+		ok = 1;
 		if (currentTime - originalTime > 3 * timeLimit){
-		tle = 1;
-		break;
+			tle = 1;
+			break;
 		}
 		string _;
 		getline(fin, _);
 		int pos = bs(0, v.size() - 1, v, _);
-		if (pos != -1){
-		if (showAllBooksPosition){
-			cout << "Found Book Code " << _ << " in booklist position of " << pos << " .\n";
-		}else{
-			cout << "Found Book Code " << _ << " .\n";
-		}
-		}else{
-		cout << "BOOK CODE " << _ << " NOT FOUND IN THE BOOKLIST.\n";
+		if (_ != ""){
+			if (pos != -1){
+				if (showAllBooksPosition == 2){
+					cout << "Found Book Code " << _ << " in booklist position of " << pos << " .\n";
+				}else if (showAllBooksPosition == 1){
+					cout << "Found Book Code " << _ << " .\n";
+				}
+			}else{
+				cout << "BOOK CODE " << _ << " NOT FOUND IN THE BOOKLIST.\n";
+			}
 		}
 	}
 	fin.close();
 	if (tle){
 		cout << "Failed to check all the books in targeted file.\n";
 		timeLimitExceedError();
+	}else if (!ok){
+		cout << "You have checked a blank file. Please make sure that you have typed the file location correctly.\n";
 	}else{
 		cout << "Sucessfully check all the books in targeted file.\n";
 	}
@@ -319,23 +327,34 @@ void check(){
 		vector<pair<string, int>> tempBooklist = loadBooklist(defaultFileLocation);
 
 		if (s.size() < 8){
-		//check last saved file
-		cout << "Checking file " << tracking << ".txt.\n";
-		smallCheck(tracking, tempBooklist);
+			//check last saved file
+			cout << "Checking file " << tracking << ".txt.\n";
+			smallCheck(tracking, tempBooklist);
 		}else{
-		string sub = s.substr(8, s.size() - 8);
-		cout << "Checking file " << sub << ".txt.\n";
-		smallCheck(sub, tempBooklist);
+			string sub = s.substr(8, s.size() - 8);
+			cout << "Checking file " << sub << ".txt.\n";
+			smallCheck(sub, tempBooklist);
 		}
 	}else{
 		if (s.size() < 8){
-		cout << "Checking file " << tracking << ".txt.\n";
-		smallCheck(tracking, booklist);
+			cout << "Checking file " << tracking << ".txt.\n";
+			smallCheck(tracking, booklist);
 		}else{
-		string sub = s.substr(7, s.size() - 7);\
-		cout << "Checking file " << sub << ".txt.\n";
-		smallCheck(sub, booklist);
+			string sub = s.substr(7, s.size() - 7);\
+			cout << "Checking file " << sub << ".txt.\n";
+			smallCheck(sub, booklist);
 		}
+	}
+}
+
+void reload(){
+	if (s.size() < 9){
+		commandSyntaxError();
+	}else{
+		booklist.clear();
+		string sub = s.substr(8, s.size() - 8);
+		booklist = loadBooklist(sub);
+		cout << "Reloaded.\n";
 	}
 }
 
@@ -369,9 +388,14 @@ void commandHandling(){
 	//count
   	if (cmd == "COUNT") count();
 
+	//check
   	if (cmd == "CHECK") check();
 
 	cmd = toUpper(s.substr(1, 6));
+	//reload
+	if (cmd == "RELOAD") reload();
+
+	//config
 	if (cmd == "CONFIG") ;
 
   
@@ -413,12 +437,4 @@ int main(){
 		getline(cin, s);
 	}
 }
-
-/*
-Added:
-Undo Error
-Checking Function
-Bugs needed to fix:
-Trailing '\n'
-*/
 
