@@ -35,4 +35,6 @@ v1.4.2
     Cut unnecessary header files
 
 v1.5
-    Checks files inputs by importing booklist into the program to ensure that it is correctly input
+    Checks files inputs by importing booklist into the program to ensure that it is valid
+    Able to refresh the booklist
+
