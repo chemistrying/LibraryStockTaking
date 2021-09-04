@@ -1,0 +1,6 @@
+limit = 
+basicLine = 
+timeLimit = 
+autosave = 
+defaultBooklistLocation = 
+showAllBooksPosition = 
