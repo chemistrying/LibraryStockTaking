@@ -14,7 +14,7 @@
 * Parse the booklist exported by the library system (Will be implemented shortly)
 * Implement a configuration system (In progress)
 * Implement a login system to have a clearer record (In progress)
-* Add some basic GUI using Win32 API (Wait until main function of the program is implemented)
+* Add some basic GUI using Win32 API (Wait until the main function of the program is implemented)
 * Use C# to implement the program (Will not implement shortly)
 * Use .NET to create fancier GUI (Will not implement shortly)
 
