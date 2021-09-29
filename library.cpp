@@ -81,14 +81,21 @@ vector<pair<string, int>> loadBooklist(string file){
 	time(&currentTime);
 	vector<pair<string, int>> internalBooklist;
 	int it = 1;
+	string _;
+	getline(fin, _);
 	while (!fin.eof()){
 		if (currentTime - originalTime > timeLimit){
 			tle = 1;
 			break;
 		}
-		string _;
-		getline(fin, _);
-		internalBooklist.push_back(make_pair(_, it++));
+		//read until the '|' character
+			getline(fin, _);
+		int p = 0;
+		string barcode;
+		while (_[p] != '|'){
+			barcode += _[p++];
+		}
+		internalBooklist.push_back(make_pair(barcode, it++));
 		time(&currentTime);
 	}
 	if (tle){
@@ -438,3 +445,5 @@ int main(){
 	}
 }
 
+//current problems
+//error when deleting last input
