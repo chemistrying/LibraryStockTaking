@@ -7,11 +7,11 @@
 * Allows deletion of inputs and undo deletions
 * Counts the number of books in a file
 * Clear guides
-* Checks inputs using a booklist predefined by users  
+* Checks inputs using a booklist exported from the library system  
   
   
 ## Future Plans: <br/>
-* Parse the booklist exported by the library system (Will be implemented shortly)
+* Parse the booklist exported from the library system (Finished)
 * Implement a configuration system (In progress)
 * Implement a login system to have a clearer record (In progress)
 * Add some basic GUI using Win32 API (Wait until the main function of the program is implemented)
