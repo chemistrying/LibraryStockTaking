@@ -10,7 +10,8 @@
 * Checks inputs using a booklist exported from the library system  
   
   
-## Future Plans: <br/>
+## Future Plans:
+
 * Parse the booklist exported from the library system (Finished)
 * Implement a configuration system (In progress)
 * Implement a login system to have a clearer record (In progress)
@@ -20,3 +21,6 @@
 * Use Python3 to implement the program (Considering as Python3 runtime will be significantly larger than C++/C#)
 * Use tkinter to create fancier GUI (Will not implement shortly and it is basically GUI in Python3)
 
+## Curent Issues:
+
+* Delete function not working
