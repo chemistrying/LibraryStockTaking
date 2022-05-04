@@ -16,4 +16,4 @@
 * Implement a login system to have a clearer record (Will be implemented in v2)
 * ~~Add some basic GUI using Win32 API (Wait until main function of the program is implemented)~~ (Cancelled)
 * Use C# to implement the program (Will be implemented in v2)
-* Use .NET to create fancier GUI (Will not implement shortly)
+* Use .NET to create fancier GUI (Will not be implemented shortly)
