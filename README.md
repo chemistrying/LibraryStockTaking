@@ -16,10 +16,10 @@
 * Implement a configuration system (In progress)
 * Implement a login system to have a clearer record (In progress)
 * Add some basic GUI using Win32 API (Wait until the main function of the program is implemented)
-* Use C# to implement the program (Will not implement shortly) (CANCELLED)
-* Use .NET to create fancier GUI (Will not implement shortly) (CANCELLED)
+* Use C# to implement the program (Will not implement shortly) (Considering)
+* Use .NET to create fancier GUI (Will not implement shortly) (Considering)
 * Use Python3 to implement the program (Considering as Python3 runtime will be significantly larger than C++/C#)
-* Use tkinter to create fancier GUI (Will not implement shortly and it is basically GUI in Python3)
+* Use tkinter to create fancier GUI (Considering)
 
 ## Curent Issues:
 
