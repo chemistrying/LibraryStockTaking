@@ -38,3 +38,7 @@ v1.5
     Checks files inputs by importing booklist into the program to ensure that it is valid
     Able to refresh the booklist
 
+v1.6
+    Fix delete operation issues (probably)
+    Split the functions from main
+    Now only supports library system generated booklist format
