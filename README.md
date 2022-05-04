@@ -10,17 +10,10 @@
 * Checks inputs using a booklist exported from the library system  
   
   
-## Future Plans:
-
-* Parse the booklist exported from the library system (Finished)
-* Implement a configuration system (In progress)
-* Implement a login system to have a clearer record (In progress)
-* Add some basic GUI using Win32 API (Wait until the main function of the program is implemented)
-* Use C# to implement the program (Will not implement shortly) (Considering)
-* Use .NET to create fancier GUI (Will not implement shortly) (Considering)
-* Use Python3 to implement the program (Considering as Python3 runtime will be significantly larger than C++/C#)
-* Use tkinter to create fancier GUI (Considering)
-
-## Curent Issues:
-
-* Delete function not working
+## Future Plans: <br/>
+* Parse the booklist exported by the library system (Implemented)
+* Implement a configuration system (Will be implemented in v2)
+* Implement a login system to have a clearer record (Will be implemented in v2)
+* ~~Add some basic GUI using Win32 API (Wait until main function of the program is implemented)~~ (Cancelled)
+* Use C# to implement the program (Will be implemented in v2)
+* Use .NET to create fancier GUI (Will not implement shortly)
