@@ -1,4 +1,4 @@
 ------------------------------------------------
-----------LibraryInventoryCheck beta-V7---------
+----------LibraryInventoryCheck v1.5.1----------
 -----Type /help to obtain the command list.-----
 ------------------------------------------------
