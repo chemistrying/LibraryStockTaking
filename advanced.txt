@@ -1,0 +1,5 @@
+-----Advanced Commands-----
+    /clear                  (Will be implemented later)
+    /reload {filelocation}  Manually load a booklist to the program.
+                            Note: A specfied filelocation is REQUIRED in order to work.
+                            NOTE: RELOAD FUNCTION WILL CLEAR ALL THE BOOKS LOADED IN THE PROGRAM BEFORE, AND LOAD THE ONES IN THE SPECIFIED FILELOCATION.
