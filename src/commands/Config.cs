@@ -7,7 +7,7 @@ public class Config
 
     public Config()
     {
-        DefaultBooklistLocation = "booklist.txt";
+        DefaultBooklistLocation = "booklist";
         DefaultSaveLocation = "foo";
         ShowAllBooksPosition = false;
     }
