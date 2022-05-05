@@ -5,6 +5,11 @@ public class Commands
 
     }
 
+    public void LoadSystemMessage()
+    {
+        Console.WriteLine(File.ReadAllText("systemMessage.txt"));
+    }
+
     public void Del(int Args)
     {   
         if (Args == 0)
@@ -17,13 +22,18 @@ public class Commands
             }
             else
             {
+                Globals._normalUndoStack.Push(Tuple.Create(0, new List<string>() {Globals._buffer[Globals._buffer.Count - 1]}));
+                // Console.WriteLine(Globals._buffer[Globals._buffer.Count - 1]);
+                // Console.WriteLine(Globals._normalUndoStack.First().Item2[0]);
                 Globals._buffer.RemoveAt(Globals._buffer.Count - 1);
             }
         }
         else if (Args > 0)
         {   
             // Remove last x books
+            Globals._normalUndoStack.Push(Tuple.Create(Args, Globals._buffer.GetRange(Math.Min(0, Globals._buffer.Count - 1 - Args), Math.Max(Globals._buffer.Count, Args))));
             Globals._buffer.RemoveRange(Math.Min(0, Globals._buffer.Count - 1 - Args), Math.Max(Globals._buffer.Count, Args));
+
         }
         else
         {
@@ -35,6 +45,7 @@ public class Commands
             }
             else
             {
+                Globals._normalUndoStack.Push(Tuple.Create(Args, new List<string>() {Globals._buffer[Globals._buffer.Count + Args]}));
                 Globals._buffer.RemoveAt(Globals._buffer.Count + Args);
             }
         }
@@ -61,7 +72,38 @@ public class Commands
         
         File.AppendAllText(fileLocation + ".txt", string.Join("\n", Globals._buffer) + "\n");
         Globals._buffer.Clear();
+        Globals._normalUndoStack.Clear();
         Console.WriteLine($"Successfully saved to \"{fileLocation}.txt\".");
+    }
+
+    public void Undo()
+    {
+        if (Globals._normalUndoStack.Count == 0)
+        {
+            Console.WriteLine("There is nothing to undo.");
+        }
+        else
+        {
+            Tuple<int, List<string>> Operation = Globals._normalUndoStack.First();
+            if (Operation.Item1 == 0)
+            {
+                Globals._buffer.Add(Operation.Item2[0]);
+                // Console.WriteLine(string.Join("\n", Globals._buffer));
+            }
+            else if (Operation.Item1 > 0)
+            {
+                foreach (string Item in Operation.Item2)
+                {
+                    Globals._buffer.Add(Item);
+                }
+            }
+            else
+            {
+                Globals._buffer.Insert(Globals._buffer.Count + 1 + Operation.Item1, Operation.Item2[0]);
+            }
+            Globals._normalUndoStack.Pop();
+        }
+        
     }
 
     public void Help(string Args)
@@ -127,12 +169,12 @@ public class Commands
                     }
                     else if (Globals._config.ShowAllBooksPosition)
                     {
-                        Console.WriteLine($"Found Book {Barcode} in booklist position of {Pos}.");
+                        Console.WriteLine($"Found Book {Barcode} in booklist position of {Globals._originalBooklistIndex[Pos]}.");
                     }
                 }
             }
             long EndTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            Console.WriteLine($"Successfully check all the books in \"{fileLocation}.txt\" in {EndTime / 1000.0 - StartTime / 1000.0} second(s).");
+            Console.WriteLine($"Successfully check all the books in \"{fileLocation}.txt\" in {Math.Round(EndTime / 1000.0 - StartTime / 1000.0, 3)} second(s).");
         }
         catch
         {
@@ -145,20 +187,35 @@ public class Commands
         // clear the booklist
         Globals._booklist.Clear();
         string fileLocation = Args;
+        // Console.WriteLine(Args);
         try
         {
             using (StreamReader sr = new StreamReader(fileLocation + ".txt"))
             {
-                while (!sr.EndOfStream){
+                while (!sr.EndOfStream)
+                {
                     string Book = sr.ReadLine();
                     Globals._booklist.Add(Book.Substring(0, Book.IndexOf('|')));
                 }
             }
             Globals._booklist.Sort();
+
+            Globals._originalBooklistIndex = new int[Globals._booklist.Count];
+            using (StreamReader sr = new StreamReader(fileLocation + ".txt"))
+            {
+                int index = 1;
+                while (!sr.EndOfStream)
+                {
+                    string Book = sr.ReadLine();
+                    string Barcode = Book.Substring(0, Book.IndexOf('|'));
+                    int Pos = Position(Barcode);
+                    Globals._originalBooklistIndex[Pos] = index++;
+                }
+            }
         }
         catch
         {
-            Console.WriteLine("Booklist file location must be given in order to work.");
+            Console.WriteLine("File location is not valid.");
             return;
         }
     }
