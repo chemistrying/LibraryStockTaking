@@ -26,6 +26,7 @@ public class InputHandler
                     Globals._commands.Save(args);
                     break;
                 case "undo":
+                    Globals._commands.Undo();
                     break;
                 case "help":
                     Globals._commands.Help(args);
