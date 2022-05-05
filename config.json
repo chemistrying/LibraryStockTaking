@@ -1,5 +1,5 @@
 {
-    "DefaultBooklistLocation": "booklist.txt",
+    "DefaultBooklistLocation": "booklist",
     "DefaultSaveLocation": "foo",
     "ShowAllBooksPosition": true
 }
