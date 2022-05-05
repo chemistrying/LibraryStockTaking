@@ -133,7 +133,7 @@ vector<pair<string, int>> loadBooklist(string file){
 			barcode += _[p++];
 		}
 		internalBooklist.push_back(make_pair(barcode, it++));
-		cerr << barcode << '\n';
+		// cerr << barcode << '\n';
 	}
 	if (tle){
 		timeLimitExceedError();
