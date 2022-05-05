@@ -24,14 +24,13 @@
     /limit {integer}        (Might be implemented)
     /del [integer]          Deletes input.
                             Leaving integer blank will automatically delete last input.
-                            You may specify a certain position of input. 
                             Negative integers will delete nth last input.
-                            Positive integers will delete nth input.
+                            Positive integers will delete last n inputs.
                             Supports undo command.
                             Note: Flushed inputs (or saved inputs) is irrecoverable.
-                            Note: Position is zero-based, meaning the index of the first element is 0.
                             NOTE: INPUTING AN INTEGER LARGER THAN THE NUMBER OF ELEMENTS IN THE SYSTEM WILL CAUSE ERROR, AND UNEXPECTED ERRORS MAY OCCUR.
-    /undo                   (Will be implemented later)
+    /undo                   Undo last delete operation.
+                            Only support undoing delete function.
     /redo                   (will be implemented later)
     /count [fileLocation]   Counts the number of inputs in the file.
                             You don't have to type ".txt" at the back of the filename.
