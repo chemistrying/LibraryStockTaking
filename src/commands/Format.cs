@@ -12,7 +12,7 @@ public class Format
         if (Args.Contains('*'))
         {
             int pos = Args.IndexOf('*');
-            FrontFormat = Args.Substring(0, pos - 1);
+            FrontFormat = Args.Substring(0, pos);
             BackFormat = Args.Substring(pos + 1);
         }
         else
