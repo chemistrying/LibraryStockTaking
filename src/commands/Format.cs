@@ -1,13 +1,13 @@
 public class Format
 {
-    String FrontFormat;
-    String BackFormat;
+    string FrontFormat;
+    string BackFormat;
     public Format()
     {
         FrontFormat = "";
         BackFormat = "";
     }
-    public void Change(String Args)
+    public void Change(string Args)
     {
         if (Args.Contains('*'))
         {
@@ -21,7 +21,7 @@ public class Format
             BackFormat = "";
         }
     }
-    public String GetFormat(String Input)
+    public string GetFormat(string Input)
     {
         return FrontFormat + Input + BackFormat;
     }
