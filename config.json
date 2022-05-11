@@ -1,5 +1,5 @@
 {
     "DefaultBooklistLocation": "booklist",
     "DefaultSaveLocation": "foo",
-    "ShowAllBooksPosition": true
+    "ShowAllBooksPosition": false
 }
