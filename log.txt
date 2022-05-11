@@ -42,3 +42,9 @@ v1.6
     Fix delete operation issues (probably)
     Split the functions from main
     Now only supports library system generated booklist format
+
+v2.0
+    Total revamp of the program (rewritten in C#)
+    Removed /limit and the program no longers blocks inputs when the buffer is too large
+    Added /config command
+    Removed /clear command

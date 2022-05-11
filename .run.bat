@@ -1,0 +1,3 @@
+@echo off
+echo Start running the program...
+libraryInventoryCheck.exe
