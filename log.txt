@@ -1,28 +1,28 @@
-v1.0
+v1.0.0
     Simple formatting
     Really minimalistic program
     Supports one format only per one program run
 
-v1.1
+v1.1.0
     Provides multiple formatting in one program run
     Limits users to input 50 inputs only unless it is saved to a file
     Save file location can be determined by users
     Command must be input in capital letters
 
-v1.2
+v1.2.0
     Accepts commands in both uppercase letters and lowercase letters
     Supports deletion (not apply to saved inputs, only inputs in buffer)
     Users can now change the number of inputs limited by the system
     Syntax errors will be shown by the system
 
-v1.3
+v1.3.0
     Counts the number of books in a file
     Changed formatting code to ';'
 
 v1.3.1
     Improve count function by setting time limit
 
-v1.4
+v1.4.0
     Able to undo deletion now (yes only deletion)
     Add help function to help and guide users
     Supports clearing the undo stack
@@ -34,17 +34,34 @@ v1.4.2
     Add confirmation when saving a file
     Cut unnecessary header files
 
-v1.5
+v1.5.0
     Checks files inputs by importing booklist into the program to ensure that it is valid
     Able to refresh the booklist
 
-v1.6
+v1.6.0
     Fix delete operation issues (probably)
     Split the functions from main
     Now only supports library system generated booklist format
 
-v2.0
+v1.5.1
+    Update systemMessage.txt
+
+v1.6.1
+    Update systemMessage.txt
+    Program will no longer print out all the barcodes when loading the booklist
+
+v2.0.0
     Total revamp of the program (rewritten in C#)
     Removed /limit and the program no longers blocks inputs when the buffer is too large
     Added /config command
     Removed /clear command
+
+v2.1.0
+    Update log.txt
+    Add new config options (Autocheck, BlockInvalidInputs)
+    Config will reload when there is new config changed in the program
+    /delete and /undo now gives feedback when the command is executed successfully
+    /save command no longer outputs new line when there is nothing to save
+    Users can now type colon (':') in front of input to ignore format for this input
+    
+

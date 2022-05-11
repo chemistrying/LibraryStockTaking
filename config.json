@@ -1,5 +1,7 @@
 {
     "DefaultBooklistLocation": "booklist",
     "DefaultSaveLocation": "foo",
-    "ShowAllBooksPosition": false
+    "ShowAllBooksPosition": false,
+    "Autocheck": true,
+    "BlockInvalidInputs": true
 }

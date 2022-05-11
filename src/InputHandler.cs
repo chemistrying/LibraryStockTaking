@@ -12,6 +12,11 @@ public class InputHandler
             // format changing
             Globals._format.Change(Input.Length == 1 ? "" : Input.Substring(1));
         }
+        else if (Input.StartsWith(':'))
+        {
+            // Ignore format
+            Globals._commands.ReadInput(Input.Substring(1));
+        }
         else if (Input.StartsWith('/'))
         {
             int pos = Input.IndexOf(' ');
@@ -53,7 +58,7 @@ public class InputHandler
         }
         else
         {
-            Globals._buffer.Add(Globals._format.GetFormat(Input));
+            Globals._commands.ReadInput(Globals._format.GetFormat(Input));
         }
     }
 }

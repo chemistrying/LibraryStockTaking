@@ -10,6 +10,27 @@ public class Commands
         Console.WriteLine(File.ReadAllText("systemMessage.txt"));
     }
 
+    public void ReadInput(string Barcode)
+    {
+        // Console.WriteLine($"DEBUG: {Barcode}");
+        int Pos = Globals._config.Autocheck ? Globals._commands.Position(Barcode) : -2;
+        if (Globals._config.Autocheck)
+        {
+            if (Pos == -1)
+            {
+                Console.WriteLine("The previous barcode is invalid according to the booklist. Please fix it immediately.");
+            }
+        }
+        if (Pos != -1 || !Globals._config.BlockInvalidInputs)
+        {
+            Globals._buffer.Add(Barcode);
+        }
+        else
+        {
+            Console.WriteLine("The previous barcode has been automatically deleted because it is invalid according to the booklist.");
+        }
+    }
+
     public void Del(int Args)
     {
         if (Args == 0)
@@ -26,6 +47,7 @@ public class Commands
                 // Console.WriteLine(Globals._buffer[Globals._buffer.Count - 1]);
                 // Console.WriteLine(Globals._normalUndoStack.First().Item2[0]);
                 Globals._buffer.RemoveAt(Globals._buffer.Count - 1);
+                Console.WriteLine("Deleted previous input.");
             }
         }
         else if (Args > 0)
@@ -33,7 +55,7 @@ public class Commands
             // Remove last x books
             Globals._normalUndoStack.Push(Tuple.Create(Args, Globals._buffer.GetRange(Math.Min(0, Globals._buffer.Count - 1 - Args), Math.Max(Globals._buffer.Count, Args))));
             Globals._buffer.RemoveRange(Math.Min(0, Globals._buffer.Count - 1 - Args), Math.Max(Globals._buffer.Count, Args));
-
+            Console.WriteLine($"Deleted last {Math.Min(Globals._buffer.Count, Args)} inputs.");
         }
         else
         {
@@ -47,12 +69,18 @@ public class Commands
             {
                 Globals._normalUndoStack.Push(Tuple.Create(Args, new List<string>() { Globals._buffer[Globals._buffer.Count + Args] }));
                 Globals._buffer.RemoveAt(Globals._buffer.Count + Args);
+                Console.WriteLine($"Deleted the {Globals._buffer.Count + Args} input.");
             }
         }
     }
 
     public void Save(string Args)
     {
+        if (Globals._buffer.Count == 0)
+        {
+            Console.WriteLine("There is nothing to save.");
+            return;
+        }
         string fileLocation = Args == "" ? Globals._currentFileLocation : Args.Substring(0, Args.IndexOf(' ') == -1 ? Args.Length : Args.IndexOf(' '));
         string furtherArgs = Args.IndexOf(' ') == -1 ? "" : Args.Substring(Args.IndexOf(' ') + 1);
         if (furtherArgs != "-y")
@@ -102,6 +130,7 @@ public class Commands
                 Globals._buffer.Insert(Globals._buffer.Count + 1 + Operation.Item1, Operation.Item2[0]);
             }
             Globals._normalUndoStack.Pop();
+            Console.WriteLine("Undid last delete operation.");
         }
 
     }
@@ -215,7 +244,7 @@ public class Commands
         }
         catch
         {
-            Console.WriteLine("File location is not valid.");
+            Console.WriteLine("File location is invalid.");
             return;
         }
     }
@@ -274,6 +303,7 @@ public class Commands
             }
             File.WriteAllText("config.json", Newtonsoft.Json.JsonConvert.SerializeObject(NewConfig));
         }
+        ReloadConfig();
     }
 
     public void Quit()
