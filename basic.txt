@@ -21,7 +21,6 @@
                             Note: It is recommended to experiment these stuff by yourself.
                             Note: You don't have to input .txt when saving.
                             NOTE: SAVE COMMAND CANNOT BE UNDONE. PLEASE CONFIRM TWICE TO SEE IF YOU FILENAME IS CORRECT.
-    /limit {integer}        (Might be implemented)
     /del [integer]          Deletes input.
                             Leaving integer blank will automatically delete last input.
                             Negative integers will delete nth last input.
