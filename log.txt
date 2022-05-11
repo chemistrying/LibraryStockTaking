@@ -46,6 +46,5 @@ v1.6
 v2.0
     Total revamp of the program (rewritten in C#)
     Removed /limit and the program no longers blocks inputs when the buffer is too large
-    Added /config
+    Added /config command
     Removed /clear command
-    
