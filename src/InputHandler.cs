@@ -41,6 +41,7 @@ public class InputHandler
                     Globals._commands.ReloadBooklist(args);
                     break;
                 case "config":
+                    Globals._commands.Config(args);
                     break;
                 case "quit":
                     Globals._commands.Quit();
