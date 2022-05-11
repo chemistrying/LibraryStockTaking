@@ -5,8 +5,13 @@
                             Leaving {format} blank equals no format. 
                             For exmaple: ;C10 will automatically add "C10" in front of the input.
                             Adding a '*' character into the format will cause the format to be splitted.
-                            For exmaple: ;3*.01 will automatically add "3" in front of the input and add ".01" after the input.
+                            For exmaple: ";3*.01" will automatically add "3" in front of the input and add ".01" after the input.
+                            Using a '+' character can add characters to the format.
+                            For example: You have a format of "10", command ";C+" will change the format to "C10";
+                            command ";C+2*+.01" will change the format to "C102*.01".
                             Default format is "".
+    :{barcode}              Ignores current format and insert the input straight to the buffer.
+                            Useful when there is a weird barcode formatting in that section.
     /quit                   Exits the program.
                             Note: All characters must be capitalized.
                             NOTE: ALL UNSAVED INPUTS WILL BE ERADICATED, PLEASE SAVE BEFORE YOU EXIT THE PROGRAM.
