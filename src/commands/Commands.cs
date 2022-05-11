@@ -11,7 +11,7 @@ public class Commands
     }
 
     public void Del(int Args)
-    {   
+    {
         if (Args == 0)
         {
             // Remove last book
@@ -22,14 +22,14 @@ public class Commands
             }
             else
             {
-                Globals._normalUndoStack.Push(Tuple.Create(0, new List<string>() {Globals._buffer[Globals._buffer.Count - 1]}));
+                Globals._normalUndoStack.Push(Tuple.Create(0, new List<string>() { Globals._buffer[Globals._buffer.Count - 1] }));
                 // Console.WriteLine(Globals._buffer[Globals._buffer.Count - 1]);
                 // Console.WriteLine(Globals._normalUndoStack.First().Item2[0]);
                 Globals._buffer.RemoveAt(Globals._buffer.Count - 1);
             }
         }
         else if (Args > 0)
-        {   
+        {
             // Remove last x books
             Globals._normalUndoStack.Push(Tuple.Create(Args, Globals._buffer.GetRange(Math.Min(0, Globals._buffer.Count - 1 - Args), Math.Max(Globals._buffer.Count, Args))));
             Globals._buffer.RemoveRange(Math.Min(0, Globals._buffer.Count - 1 - Args), Math.Max(Globals._buffer.Count, Args));
@@ -45,7 +45,7 @@ public class Commands
             }
             else
             {
-                Globals._normalUndoStack.Push(Tuple.Create(Args, new List<string>() {Globals._buffer[Globals._buffer.Count + Args]}));
+                Globals._normalUndoStack.Push(Tuple.Create(Args, new List<string>() { Globals._buffer[Globals._buffer.Count + Args] }));
                 Globals._buffer.RemoveAt(Globals._buffer.Count + Args);
             }
         }
@@ -69,7 +69,7 @@ public class Commands
                 return;
             }
         }
-        
+
         File.AppendAllText(fileLocation + ".txt", string.Join("\n", Globals._buffer) + "\n");
         Globals._buffer.Clear();
         Globals._normalUndoStack.Clear();
@@ -103,7 +103,7 @@ public class Commands
             }
             Globals._normalUndoStack.Pop();
         }
-        
+
     }
 
     public void Help(string Args)
@@ -125,7 +125,7 @@ public class Commands
     {
         string fileLocation = Args == "" ? Globals._currentFileLocation : Args.Substring(0, Args.IndexOf(' ') == -1 ? Args.Length : Args.IndexOf(' '));
         // string furtherArgs = Args.IndexOf(' ') == -1 ? "" : Args.Substring(Args.IndexOf(' ') + 1);
-        
+
         using (StreamReader sr = new StreamReader(fileLocation + ".txt"))
         {
             int cnt = 0;
@@ -181,7 +181,7 @@ public class Commands
             Console.WriteLine("File location is not valid.");
         }
     }
-    
+
     public void ReloadBooklist(string Args)
     {
         // clear the booklist
@@ -230,7 +230,16 @@ public class Commands
     {
         int Pos = Args.IndexOf(' ');
         string ConfigName = Pos == -1 ? Args : Args.Substring(0, Pos);
-        if (!Globals._config.configs.Contains(ConfigName))
+        if (Args == "")
+        {
+            dynamic json = Newtonsoft.Json.JsonConvert.DeserializeObject(File.ReadAllText("config.json"));
+            Dictionary<string, dynamic> NewConfig = json.ToObject(typeof(Dictionary<string, dynamic>));
+            foreach (KeyValuePair<string, dynamic> Item in NewConfig)
+            {
+                Console.WriteLine($"{Item.Key}: {Item.Value}");
+            }
+        }
+        else if (!Globals._config.configs.Contains(ConfigName))
         {
             Console.WriteLine("Configuration Name is wrong. Please check if there are any spelling mistakes.");
         }
@@ -242,6 +251,28 @@ public class Commands
             {
                 Console.WriteLine($"{ConfigName}: {NewConfig[ConfigName]}");
             }
+            else
+            {
+                string Value = Args.Substring(Pos + 1);
+                if (Array.IndexOf(Globals._config.configs, ConfigName) >= 2)
+                {
+                    try
+                    {
+                        NewConfig[ConfigName] = Convert.ToBoolean(Value);
+                    }
+                    catch
+                    {
+                        Console.WriteLine("The value is invalid.");
+                        return;
+                    }
+                }
+                else
+                {
+                    NewConfig[ConfigName] = Value;
+                }
+                Console.WriteLine($"Successfully changed {ConfigName} value to {Value}.");
+            }
+            File.WriteAllText("config.json", Newtonsoft.Json.JsonConvert.SerializeObject(NewConfig));
         }
     }
 
