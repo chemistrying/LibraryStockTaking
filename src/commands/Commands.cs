@@ -213,9 +213,11 @@ public class Commands
 
     public void ReloadBooklist(string Args)
     {
+        // backup the booklist
+        List<string> Backup = Globals._booklist;
         // clear the booklist
         Globals._booklist.Clear();
-        string fileLocation = Args;
+        string fileLocation = Args == "" ? Globals._config.DefaultBooklistLocation : Args;
         // Console.WriteLine(Args);
         try
         {
@@ -227,6 +229,7 @@ public class Commands
                     Globals._booklist.Add(Book.Substring(0, Book.IndexOf('|')));
                 }
             }
+            Console.WriteLine("OK");
             Globals._booklist.Sort();
 
             Globals._originalBooklistIndex = new int[Globals._booklist.Count];
@@ -241,10 +244,12 @@ public class Commands
                     Globals._originalBooklistIndex[Pos] = index++;
                 }
             }
+            Console.WriteLine("Booklist has been successfully reloaded.");
         }
         catch
         {
             Console.WriteLine("File location is invalid.");
+            Globals._booklist = Backup;
             return;
         }
     }
