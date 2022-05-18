@@ -7,7 +7,7 @@ public class Commands
 
     public void LoadSystemMessage()
     {
-        Console.WriteLine(File.ReadAllText("systemMessage.txt"));
+        Console.WriteLine(File.ReadAllText(Globals._config.DefaultProgramFilesLocation + "systemMessage.txt"));
     }
 
     public void ReadInput(string Barcode)
@@ -139,14 +139,14 @@ public class Commands
     {
         bool Basic = Args.ToLower() == "basic";
         bool Advanced = Args.ToLower() == "advanced";
-        Console.WriteLine(File.ReadAllText("help.txt"));
+        Console.WriteLine(File.ReadAllText(Globals._config.DefaultProgramFilesLocation + "help.txt"));
         if (Basic || !(Basic | Advanced))
         {
-            Console.WriteLine(File.ReadAllText("basic.txt"));
+            Console.WriteLine(File.ReadAllText(Globals._config.DefaultProgramFilesLocation + "basic.txt"));
         }
         if (Advanced || !(Basic | Advanced))
         {
-            Console.WriteLine(File.ReadAllText("advanced.txt"));
+            Console.WriteLine(File.ReadAllText(Globals._config.DefaultProgramFilesLocation + "advanced.txt"));
         }
     }
 
@@ -288,7 +288,7 @@ public class Commands
             else
             {
                 string Value = Args.Substring(Pos + 1);
-                if (Array.IndexOf(Globals._config.configs, ConfigName) >= 2)
+                if (Array.IndexOf(Globals._config.configs, ConfigName) >= 3)
                 {
                     try
                     {
