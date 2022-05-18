@@ -13,7 +13,7 @@ public class Config
     {
         DefaultBooklistLocation = "booklist";
         DefaultSaveLocation = "foo";
-        DefaultProgramFilesLocation = "files";
+        DefaultProgramFilesLocation = "files\\";
         ShowAllBooksPosition = false;
         Autocheck = false;
         BlockInvalidInputs = false;
