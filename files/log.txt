@@ -69,4 +69,7 @@ v2.1.1
     /reload command will provide feedback when it is reloaded successfully
     /reload command will no longer clear booklist when it is reloaded unsuccessfully
     
-
+v2.1.2
+    Update default booklist.txt to 18-5-2022 version
+    Organize the text files to a single folder so that it becomes more readable
+    Remove "OK" when /reload
