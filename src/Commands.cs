@@ -256,7 +256,7 @@ public class Commands
 
     public void ReloadConfig()
     {
-        dynamic json = Newtonsoft.Json.JsonConvert.DeserializeObject(File.ReadAllText("config.json"));
+        dynamic json = Newtonsoft.Json.JsonConvert.DeserializeObject(File.ReadAllText(Globals._config.DefaultProgramFilesLocation + "config.json"));
         Globals._config = json.ToObject(typeof(Config));
     }
 
@@ -266,7 +266,7 @@ public class Commands
         string ConfigName = Pos == -1 ? Args : Args.Substring(0, Pos);
         if (Args == "")
         {
-            dynamic json = Newtonsoft.Json.JsonConvert.DeserializeObject(File.ReadAllText("config.json"));
+            dynamic json = Newtonsoft.Json.JsonConvert.DeserializeObject(File.ReadAllText(Globals._config.DefaultProgramFilesLocation + "config.json"));
             Dictionary<string, dynamic> NewConfig = json.ToObject(typeof(Dictionary<string, dynamic>));
             foreach (KeyValuePair<string, dynamic> Item in NewConfig)
             {
@@ -279,7 +279,7 @@ public class Commands
         }
         else
         {
-            dynamic json = Newtonsoft.Json.JsonConvert.DeserializeObject(File.ReadAllText("config.json"));
+            dynamic json = Newtonsoft.Json.JsonConvert.DeserializeObject(File.ReadAllText(Globals._config.DefaultProgramFilesLocation + "config.json"));
             Dictionary<string, dynamic> NewConfig = json.ToObject(typeof(Dictionary<string, dynamic>));
             if (Pos == -1)
             {
@@ -306,7 +306,7 @@ public class Commands
                 }
                 Console.WriteLine($"Successfully changed {ConfigName} value to {Value}.");
             }
-            File.WriteAllText("config.json", Newtonsoft.Json.JsonConvert.SerializeObject(NewConfig));
+            File.WriteAllText(Globals._config.DefaultProgramFilesLocation + "config.json", Newtonsoft.Json.JsonConvert.SerializeObject(NewConfig));
         }
         ReloadConfig();
     }
