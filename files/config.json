@@ -1,7 +1,7 @@
 {
     "DefaultBooklistLocation": "files\\booklist",
     "DefaultSaveLocation": "foo",
-    "defaultProgramFilesLocation": "files",
+    "defaultProgramFilesLocation": "files\\",
     "ShowAllBooksPosition": false,
     "Autocheck": true,
     "BlockInvalidInputs": true
