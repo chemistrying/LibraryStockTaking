@@ -42,4 +42,3 @@
                             You don't have to type ".txt" at the back of the filename.
                             It checks the last save file if the filelocation is not specified.
                             It returns the book code with the position of the book in the booklist, or returns "not found" if it is not in the booklist.
-                            Default flie location is "booklist.txt".
