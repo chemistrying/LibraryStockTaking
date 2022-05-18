@@ -229,7 +229,7 @@ public class Commands
                     Globals._booklist.Add(Book.Substring(0, Book.IndexOf('|')));
                 }
             }
-            Console.WriteLine("OK");
+            // Console.WriteLine("OK");
             Globals._booklist.Sort();
 
             Globals._originalBooklistIndex = new int[Globals._booklist.Count];
