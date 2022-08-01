@@ -11,6 +11,7 @@ public class InputHandler
         {
             // format changing
             Globals._format.Change(Input.Length == 1 ? "" : Input.Substring(1));
+            Serilog.Log.Debug($"Changed input format to {Input}.");
         }
         else if (Input.StartsWith(':'))
         {

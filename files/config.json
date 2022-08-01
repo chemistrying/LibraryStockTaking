@@ -1,8 +1,1 @@
-{
-    "DefaultBooklistLocation": "files\\booklist",
-    "DefaultSaveLocation": "foo",
-    "defaultProgramFilesLocation": "files\\",
-    "ShowAllBooksPosition": false,
-    "Autocheck": true,
-    "BlockInvalidInputs": true
-}
+{"DefaultBooklistLocation":"files\\booklist","DefaultSaveLocation":"foo","DefaultProgramFilesLocation":"files\\","LoggingLevel":"Information","ShowAllBooksPosition":false,"Autocheck":true,"BlockInvalidInputs":true,"AutoCapitalize":true}

@@ -1,4 +1,6 @@
-﻿public static class Globals
+﻿using Serilog;
+
+public static class Globals
 {
     public static string _currentFileLocation = "foo";
     public static bool _running = true;
@@ -17,11 +19,16 @@ public class Program
     static void Main(string[] args)
     {
         Globals._commands.ReloadConfig();
+        SerilogCreator _serilogCreator = new SerilogCreator();
+        
         Globals._commands.ReloadBooklist(Globals._config.DefaultBooklistLocation);
+        Serilog.Log.Information("All the resources has been loaded successfully.");
+
         Globals._commands.LoadSystemMessage();
         do
         {
             string input = Console.ReadLine();
+            Serilog.Log.Debug($"Received input \"{input}\".");
             Globals._inputHandler.HandleInput(input);
         } while (Globals._running);
     }
