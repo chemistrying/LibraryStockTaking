@@ -3,15 +3,20 @@ using Serilog;
 public class SerilogCreator{
     public SerilogCreator(){
         LoggerConfiguration LogConfig = new LoggerConfiguration().WriteTo.File(Globals._config.DefaultProgramFilesLocation + "libraryLog.log");
-        if (Globals._config.LoggingLevel == "Verbose"){
+        if (Globals._config.LoggingLevel == "Verbose")
+        {
             LogConfig.MinimumLevel.Verbose();
-        }else if (Globals._config.LoggingLevel == "Debug"){
+        }else if (Globals._config.LoggingLevel == "Debug")
+        {
             LogConfig.MinimumLevel.Debug();
-        }else if (Globals._config.LoggingLevel == "Warning"){
+        }else if (Globals._config.LoggingLevel == "Warning")
+        {
             LogConfig.MinimumLevel.Warning();
-        }else if (Globals._config.LoggingLevel == "Error"){
+        }else if (Globals._config.LoggingLevel == "Error")
+        {
             LogConfig.MinimumLevel.Fatal();
-        }else{
+        }else
+        {
             LogConfig.MinimumLevel.Information();
         }
 
