@@ -52,6 +52,12 @@ public class InputHandler
                 case "quit":
                     Globals._commands.Quit();
                     break;
+                case "version":
+                    Globals._commands.Version();
+                    break;
+                case "exist":
+                    Globals._commands.Exist(args);
+                    break;
                 default:
                     Console.WriteLine("Invalid command.");
                     break;
