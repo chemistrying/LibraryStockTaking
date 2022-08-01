@@ -11,6 +11,13 @@ public class Commands
         Serilog.Log.Information("System message is loaded successfully.");
     }
 
+    public string AutoFormat(string Barcode)
+    {
+        if (Globals._config.AutoCapitalize) Barcode = Barcode.ToUpper();
+
+        return Barcode;
+    }
+
     public void ReadInput(string Barcode)
     {
         // Console.WriteLine($"DEBUG: {Barcode}");
@@ -24,7 +31,7 @@ public class Commands
         }
         if (Pos != -1 || !Globals._config.BlockInvalidInputs)
         {
-            Globals._buffer.Add(Barcode);
+            Globals._buffer.Add(AutoFormat(Barcode));
         }
         else
         {
@@ -366,5 +373,77 @@ public class Commands
     {
         Serilog.Log.Information("Program is now quitting.");
         Globals._running = false;
+    }
+
+    public void Version()
+    {
+        Config("Version");
+    }
+
+    /*
+        Process a booklist.
+        First convert to UTF-8, then split the information of each book, and merge into a booklist.
+    */
+
+    public void process()
+    {
+        
+    }
+
+    /*
+        Check every single textfile in a folder, and merge the results together
+        It returns the non-existence books.
+    */
+
+    public void Exist(string Args)
+    {
+        long StartTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+
+        string Location = Globals._config.DefaultProgramFilesLocation + Args;
+        string[] FileNames = Directory.GetFiles(Location);
+        if (FileNames.Length == 0)
+        {
+            Serilog.Log.Warning($"There are no files in the directory {Location}.");
+            Console.WriteLine("There are no files in the directory.");
+        }
+
+        int TotalBarcodes = 0;
+        HashSet<string> Barcodes = new HashSet<string>();
+        int InvalidCnt = 0;
+
+        foreach (string FileName in FileNames)
+        {
+            if (FileName.Length < 4)
+            {
+                continue;
+            }
+            else if (FileName.Substring(FileName.Length - 4) != ".txt")
+            {
+                continue;
+            }
+
+            // Console.WriteLine(FileName);
+
+            using (StreamReader sr = new StreamReader(FileName))
+            {
+                while (!sr.EndOfStream){
+                    string Temp = AutoFormat(sr.ReadLine());
+                    Console.WriteLine(Temp);
+                    if (Position(Temp) != -1)
+                    {
+                        Barcodes.Add(Temp);
+                    }
+                    else
+                    {
+                        InvalidCnt++;
+                    }
+                    TotalBarcodes++;
+                }
+            }
+        }
+        
+        Console.WriteLine($"Merged a total of {Barcodes.Count} barcode(s).");
+        Console.WriteLine($"Found {TotalBarcodes - Barcodes.Count} duplicated barcode(s).");
+        Console.WriteLine($"Found {InvalidCnt} invalid barcodes(s)");
     }
 }
