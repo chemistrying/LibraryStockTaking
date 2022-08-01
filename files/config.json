@@ -3,6 +3,7 @@
     "DefaultSaveLocation": "foo",
     "DefaultProgramFilesLocation": "files\\",
     "LoggingLevel": "Information",
+    "Version": "2.3.0",
     "ShowAllBooksPosition": false,
     "Autocheck": true,
     "BlockInvalidInputs": true,
