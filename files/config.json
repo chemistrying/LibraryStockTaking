@@ -7,5 +7,7 @@
     "ShowAllBooksPosition": false,
     "Autocheck": true,
     "BlockInvalidInputs": true,
-    "AutoCapitalize": true
+    "AutoCapitalize": true,
+    "AutoZero" : true,
+    "UseDetailBooklist": true
 }
