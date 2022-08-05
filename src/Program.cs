@@ -12,15 +12,18 @@ public static class Globals
     public static List<string> _buffer = new List<string>();
     public static List<string> _booklist = new List<string>();
     public static int[] _originalBooklistIndex = new int[_booklist.Count];
+    public static Dictionary<string, Book> _deatailBooklist = new Dictionary<string, Book>();
 }
 
 public class Program
 {
     static void Main(string[] args)
     {
+        System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+
         Globals._commands.ReloadConfig();
         SerilogCreator _serilogCreator = new SerilogCreator();
-        
+
         Globals._commands.ReloadBooklist(Globals._config.DefaultBooklistLocation);
         Serilog.Log.Information("All the resources has been loaded successfully.");
 
