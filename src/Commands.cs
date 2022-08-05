@@ -1,3 +1,5 @@
+using System.Text;
+
 public class Commands
 {
     public Commands()
@@ -11,9 +13,48 @@ public class Commands
         Serilog.Log.Information("System message is loaded successfully.");
     }
 
+    public string Zeroify(string Barcode)
+    {
+        bool ok = true;
+        // check if the Barcode is all numbers
+        for (int i = 0; i < Barcode.Length; i++)
+        {   
+            ok &= (Barcode[i] >= '0' && Barcode[i] <= '9');
+        }
+
+        if (ok)
+        {
+            // Console.WriteLine(Barcode);
+            string Front = new String('0', Math.Max(0, 5 - Barcode.Length));
+            Barcode = Front + Barcode;
+        }
+
+        return Barcode;
+    }
+
     public string AutoFormat(string Barcode)
     {
+        if (Barcode.Length == 0)
+        {
+            return Barcode;
+        }
+
         if (Globals._config.AutoCapitalize) Barcode = Barcode.ToUpper();
+        if (Globals._config.AutoZero)
+        {
+            // Console.WriteLine("OK");
+            if (Barcode.Length < 5)
+            {
+                Barcode = Zeroify(Barcode);
+            }
+            else if (Barcode.First() == 'C' && Barcode.Length < 6)
+            {
+                // Console.WriteLine("SAD");
+                // Console.WriteLine(Barcode);
+                Barcode = 'C' + Zeroify(Barcode.Substring(1));
+                File.AppendAllText("files\\zeros.txt", Barcode + '\n');
+            }
+        }
 
         return Barcode;
     }
@@ -21,6 +62,8 @@ public class Commands
     public void ReadInput(string Barcode)
     {
         // Console.WriteLine($"DEBUG: {Barcode}");
+        Barcode = AutoFormat(Barcode);
+
         int Pos = Globals._config.Autocheck ? Globals._commands.Position(Barcode) : -2;
         if (Globals._config.Autocheck)
         {
@@ -31,7 +74,9 @@ public class Commands
         }
         if (Pos != -1 || !Globals._config.BlockInvalidInputs)
         {
-            Globals._buffer.Add(AutoFormat(Barcode));
+            Globals._buffer.Add(Barcode);
+            Book CurrBook = Globals._deatailBooklist[Barcode];
+            Console.WriteLine($"{CurrBook.Callno1} {CurrBook.Callno2} {CurrBook.Name}");
         }
         else
         {
@@ -256,7 +301,6 @@ public class Commands
         // clear the booklist
         Globals._booklist.Clear();
         string fileLocation = Args == "" ? Globals._config.DefaultBooklistLocation : Args;
-        // Console.WriteLine(Args);
         try
         {
             using (StreamReader sr = new StreamReader(fileLocation + ".txt"))
@@ -385,9 +429,44 @@ public class Commands
         First convert to UTF-8, then split the information of each book, and merge into a booklist.
     */
 
-    public void process()
+    public string Utfy(string Stuff)
     {
+        Encoding big5 = Encoding.GetEncoding("big5");
+        Encoding utf16 = Encoding.Unicode;
+
+        byte[] Big5Bytes = big5.GetBytes(Stuff);
+        byte[] Utf8Bytes = Encoding.Convert(big5, utf16, Big5Bytes);
+
+        char[] Utf8Chars = new char[utf16.GetCharCount(Utf8Bytes, 0, Utf8Bytes.Length)];
+        utf16.GetChars(Utf8Bytes, 0, Utf8Bytes.Length, Utf8Chars, 0);
+        return new string(Utf8Chars);
+    }
+
+    public void Process(string Args)
+    {
+        int Pos = Args.IndexOf(' ');
+        if (Pos == -1 || Pos == Args.Length)
+        {
+            Serilog.Log.Warning("Invalid arguments for processing the booklist.");
+            Console.WriteLine("You must provide the input booklist and the output location in order to work.");
+            return;
+        }
         
+        string Input = Globals._config.DefaultProgramFilesLocation + Args.Substring(0, Pos);
+        string Output = Globals._config.DefaultProgramFilesLocation + Args.Substring(Pos + 1);
+
+        using (StreamReader sr = new StreamReader(Input))
+        {
+            sr.ReadLine();
+            while (!sr.EndOfStream)
+            {
+                // Console.WriteLine(sr.ReadLine());
+                // Book CurrBook = new Book(sr);
+                string[] Blocks = sr.ReadLine().Split("| ");
+                Book CurrBook = new Book(Blocks);
+                Globals._deatailBooklist.Add(CurrBook.Acno, CurrBook);
+            }
+        }
     }
 
     /*
@@ -407,10 +486,66 @@ public class Commands
             Console.WriteLine("There are no files in the directory.");
         }
 
-        int TotalBarcodes = 0;
+        int TotalBarcodes = 0; // Include invalid, duplicated
         HashSet<string> Barcodes = new HashSet<string>();
-        int InvalidCnt = 0;
+        bool[] Existence = new bool[Globals._booklist.Count];
+        int InvalidCnt = 0; // Include duplicated invalid barcodes
 
+        HashSet<KeyValuePair<int, string>> Invalids = new HashSet<KeyValuePair<int, string>>();
+
+        foreach (string FileName in FileNames)
+        {
+            if (FileName.Length < 4)
+            {
+                continue;
+            }
+            else if (FileName.Substring(FileName.Length - 4) != ".txt")
+            {
+                continue;
+            }
+
+            // Console.WriteLine(FileName); 
+
+            using (StreamReader sr = new StreamReader(FileName))
+            {
+                while (!sr.EndOfStream){
+                    string Temp = AutoFormat(sr.ReadLine());
+                    // Console.WriteLine(Temp);
+
+                    int Pos = Position(Temp);
+                    if (Pos != -1)
+                    {
+                        Barcodes.Add(Temp);
+                        Existence[Pos] = true;
+                    }
+                    else
+                    {
+                        Invalids.Add(new KeyValuePair<int, string>(TotalBarcodes + 1, Temp));
+                        InvalidCnt++;
+                    }
+                    TotalBarcodes++;
+                }
+            }
+        }
+        
+        Console.WriteLine($"Merged a total of {Barcodes.Count} barcode(s).");
+        Console.WriteLine($"Found {TotalBarcodes - InvalidCnt - Barcodes.Count} duplicated barcode(s).");
+        Console.WriteLine($"Found {InvalidCnt} invalid barcodes(s).");
+        Console.WriteLine($"{Globals._booklist.Count - Barcodes.Count} book(s) are missing.");
+
+        using (StreamWriter sw = new StreamWriter(Globals._config.DefaultProgramFilesLocation + "report.txt"))
+        {
+            for (int i = 0; i < Globals._booklist.Count; i++)
+            {
+                if (!Existence[i])
+                {
+                    sw.WriteLine(Globals._booklist[i]);
+                }
+            }
+        }
+
+
+        HashSet<string> CheckDuplicated = new HashSet<string>();
         foreach (string FileName in FileNames)
         {
             if (FileName.Length < 4)
@@ -424,26 +559,37 @@ public class Commands
 
             // Console.WriteLine(FileName);
 
+            int Dup = 0;
             using (StreamReader sr = new StreamReader(FileName))
             {
-                while (!sr.EndOfStream){
-                    string Temp = AutoFormat(sr.ReadLine());
-                    Console.WriteLine(Temp);
-                    if (Position(Temp) != -1)
-                    {
-                        Barcodes.Add(Temp);
+                using (StreamWriter sw = new StreamWriter(Globals._config.DefaultProgramFilesLocation + "StockTakingData_02082022.txt"))
+                {
+                    while (!sr.EndOfStream){
+                        string Temp = AutoFormat(sr.ReadLine());
+                        if (!CheckDuplicated.Contains(Temp))
+                        {
+                            sw.WriteLine(Temp);
+                            CheckDuplicated.Add(Temp);
+                        }
+                        else if (Position(Temp) != -1)
+                        {
+                            Dup++;
+                        }
                     }
-                    else
-                    {
-                        InvalidCnt++;
-                    }
-                    TotalBarcodes++;
                 }
             }
+            Console.WriteLine($"Check Dup: {Dup}");
         }
-        
-        Console.WriteLine($"Merged a total of {Barcodes.Count} barcode(s).");
-        Console.WriteLine($"Found {TotalBarcodes - Barcodes.Count} duplicated barcode(s).");
-        Console.WriteLine($"Found {InvalidCnt} invalid barcodes(s)");
+
+        using (StreamWriter sw = new StreamWriter(Globals._config.DefaultProgramFilesLocation + "invalidReport.txt"))
+        {
+            foreach (var Invalid in Invalids)
+            {
+                sw.WriteLine($"{Invalid.Key} {Invalid.Value}");
+            }
+        }
+
+        long EndTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+        Console.WriteLine($"Used {Math.Round(EndTime / 1000.0 - StartTime / 1000.0, 3)} second(s) to check existence.");
     }
 }
