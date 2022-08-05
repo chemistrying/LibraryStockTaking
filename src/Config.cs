@@ -9,7 +9,8 @@ public class Config
     public bool Autocheck;
     public bool BlockInvalidInputs;
     public bool AutoCapitalize;
-    public string[] configs = new string[9] 
+    public bool AutoZero;
+    public string[] configs = new string[10] 
     {
         "DefaultBooklistLocation",
         "DefaultSaveLocation",
@@ -19,7 +20,8 @@ public class Config
         "ShowAllBooksPosition",
         "Autocheck",
         "BlockInvalidInputs",
-        "AutoCapitalize"
+        "AutoCapitalize",
+        "AutoZero"
     };
     // public Type[] configTypes = new Type[5] {typeof(string), typeof(string), typeof(bool), typeof(bool), typeof(bool)};
 
@@ -34,5 +36,6 @@ public class Config
         Autocheck = false;
         BlockInvalidInputs = false;
         AutoCapitalize = false;
+        AutoZero = false;
     }
 }
