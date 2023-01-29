@@ -75,7 +75,7 @@ public class Commands
         if (Pos != -1 || !Globals._config.BlockInvalidInputs)
         {
             Globals._buffer.Add(Barcode);
-            Book CurrBook = Globals._deatailBooklist[Barcode];
+            Book CurrBook = Globals._detailBooklist[Barcode];
             Console.WriteLine($"{CurrBook.Callno1} {CurrBook.Callno2} {CurrBook.Name}");
         }
         else
@@ -153,6 +153,7 @@ public class Commands
                 Console.Write($"Confirm saving into \"{fileLocation}.txt\" this file? [Y|N] ");
                 Confirm = Console.ReadLine();
             } while (Confirm != "Y" && Confirm != "N");
+
             if (Confirm == "N")
             {
                 Serilog.Log.Information("Save operation has been cancelled safely.");
@@ -164,8 +165,11 @@ public class Commands
         File.AppendAllText(fileLocation + ".txt", string.Join("\n", Globals._buffer) + "\n");
         Globals._buffer.Clear();
         Globals._normalUndoStack.Clear();
+        Globals._currentFileLocation = fileLocation;
+
         Serilog.Log.Information($"Successfully save inputs to \"{fileLocation}.txt\".");
         Serilog.Log.Debug($"Inputs saved: {string.Join(", ", Globals._buffer)}");
+
         Console.WriteLine($"Successfully saved to \"{fileLocation}.txt\".");
     }
 
@@ -220,7 +224,7 @@ public class Commands
 
     public void Count(string Args)
     {
-        string fileLocation = Args == "" ? Globals._currentFileLocation : Args.Substring(0, Args.IndexOf(' ') == -1 ? Args.Length : Args.IndexOf(' '));
+        string fileLocation = (Args == "" ? Globals._currentFileLocation : Args.Substring(0, Args.IndexOf(' ') == -1 ? Args.Length : Args.IndexOf(' ')));
         // string furtherArgs = Args.IndexOf(' ') == -1 ? "" : Args.Substring(Args.IndexOf(' ') + 1);
 
         try{
@@ -300,7 +304,7 @@ public class Commands
         List<string> Backup = Globals._booklist;
         // clear the booklist
         Globals._booklist.Clear();
-        string fileLocation = Args == "" ? Globals._config.DefaultBooklistLocation : Args;
+        string fileLocation = Globals._config.DefaultProgramFilesLocation + (Args == "" ? Globals._config.DefaultBooklistLocation : Args);
         try
         {
             using (StreamReader sr = new StreamReader(fileLocation + ".txt"))
@@ -339,18 +343,24 @@ public class Commands
 
     public void ReloadConfig()
     {
-        try{
+        try
+        {
             Serilog.Log.Debug("Reloading config.");
-        }catch{
+        }
+        catch
+        {
             ;
         }
 
         dynamic json = Newtonsoft.Json.JsonConvert.DeserializeObject(File.ReadAllText(Globals._config.DefaultProgramFilesLocation + "config.json"));
         Globals._config = json.ToObject(typeof(Config));
 
-        try{
+        try
+        {
             Serilog.Log.Debug("Config reloaded successfully.");
-        }catch{
+        }
+        catch
+        {
             ;
         }
     }
@@ -370,7 +380,7 @@ public class Commands
             }
             Serilog.Log.Information("Config options and values has been listed successfully.");
         }
-        else if (!Globals._config.configs.Contains(ConfigName))
+        else if (!Globals._config.Options.Contains(ConfigName))
         {
             Serilog.Log.Warning($"Configuration name {ConfigName} is invalid.");
             Console.WriteLine("Configuration Name is wrong. Please check if there are any spelling mistakes.");
@@ -387,7 +397,7 @@ public class Commands
             else
             {
                 string Value = Args.Substring(Pos + 1);
-                if (Array.IndexOf(Globals._config.configs, ConfigName) >= 4)
+                if (Array.IndexOf(Globals._config.Options, ConfigName) >= 4)
                 {
                     try
                     {
@@ -444,16 +454,15 @@ public class Commands
 
     public void Process(string Args)
     {
-        int Pos = Args.IndexOf(' ');
-        if (Pos == -1 || Pos == Args.Length)
+        // int Pos = Args.IndexOf(' ');
+        if (Args.Length == 0)
         {
             Serilog.Log.Warning("Invalid arguments for processing the booklist.");
             Console.WriteLine("You must provide the input booklist and the output location in order to work.");
             return;
         }
         
-        string Input = Globals._config.DefaultProgramFilesLocation + Args.Substring(0, Pos);
-        string Output = Globals._config.DefaultProgramFilesLocation + Args.Substring(Pos + 1);
+        string Input = Globals._config.DefaultProgramFilesLocation + Args + ".txt";
 
         using (StreamReader sr = new StreamReader(Input))
         {
@@ -464,7 +473,7 @@ public class Commands
                 // Book CurrBook = new Book(sr);
                 string[] Blocks = sr.ReadLine().Split("| ");
                 Book CurrBook = new Book(Blocks);
-                Globals._deatailBooklist.Add(CurrBook.Acno, CurrBook);
+                Globals._detailBooklist.Add(CurrBook.Acno, CurrBook);
             }
         }
     }
