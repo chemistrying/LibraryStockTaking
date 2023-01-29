@@ -10,9 +10,8 @@ public class Config
     public bool BlockInvalidInputs;
     public bool AutoCapitalize;
     public bool AutoZero;
-    public bool AutoProcess;
     public bool DetailedBooklist;
-    public string[] Options = new string[12] 
+    public string[] Options = new string[11] 
     {
         "DefaultBooklistLocation",
         "DefaultSaveLocation",
@@ -24,7 +23,6 @@ public class Config
         "BlockInvalidInputs",
         "AutoCapitalize",
         "AutoZero",
-        "AutoProcess",
         "DetailedBooklist"
     };
     // public Type[] configTypes = new Type[5] {typeof(string), typeof(string), typeof(bool), typeof(bool), typeof(bool)};
@@ -41,7 +39,6 @@ public class Config
         BlockInvalidInputs = false;
         AutoCapitalize = false;
         AutoZero = false;
-        AutoProcess = false;
         DetailedBooklist = false;
     }
 }

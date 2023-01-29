@@ -8,7 +8,6 @@
     "Autocheck": true,
     "BlockInvalidInputs": true,
     "AutoCapitalize": true,
-    "AutoZero" : true,
-    "AutoProcess": true,
-    "DetailedBooklist" : true
+    "AutoZero": true,
+    "DetailedBooklist": true
 }
