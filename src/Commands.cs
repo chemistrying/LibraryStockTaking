@@ -79,8 +79,16 @@ public class Commands
             // Only output book information when detailed booklist is used
             if (Globals._config.DetailedBooklist)
             {
-                Book CurrBook = Globals._detailBooklist[Barcode];
-                Console.WriteLine($"{CurrBook.Callno1} {CurrBook.Callno2} {CurrBook.Name}");
+                try
+                {
+                    Book CurrBook = Globals._detailBooklist[Barcode];
+                    Console.WriteLine($"{CurrBook.Callno1} {CurrBook.Callno2} {CurrBook.Name}");
+                }
+                catch
+                {
+                    Serilog.Log.Warning("No detailed booklist is stored in the system! Can't print book info to users!");
+                    Console.WriteLine("DetailedBooklist is turned on but no detailed booklist is stored in the system. You may want to run /process {fileLocation} first to use detailed booklist or turn off detailed booklist by running command /config DetailedBooklist false.");
+                }
             }
         }
         else
@@ -346,7 +354,7 @@ public class Commands
         }
 
         // Only auto processing the new booklist if auto processing is on
-        if (Globals._config.AutoProcess)
+        if (Globals._config.DetailedBooklist)
         {
             Globals._commands.Process(fileLocation);
         }
@@ -473,7 +481,7 @@ public class Commands
             return;
         }
         
-        string Input = Globals._config.DefaultProgramFilesLocation + Args + ".txt";
+        string Input = Args + ".txt";
 
         using (StreamReader sr = new StreamReader(Input))
         {
