@@ -52,7 +52,7 @@ public class Commands
                 // Console.WriteLine("SAD");
                 // Console.WriteLine(Barcode);
                 Barcode = 'C' + Zeroify(Barcode.Substring(1));
-                File.AppendAllText("files\\zeros.txt", Barcode + '\n');
+                // File.AppendAllText("files\\zeros.txt", Barcode + '\n');
             }
         }
 
@@ -75,8 +75,13 @@ public class Commands
         if (Pos != -1 || !Globals._config.BlockInvalidInputs)
         {
             Globals._buffer.Add(Barcode);
-            Book CurrBook = Globals._detailBooklist[Barcode];
-            Console.WriteLine($"{CurrBook.Callno1} {CurrBook.Callno2} {CurrBook.Name}");
+
+            // Only output book information when detailed booklist is used
+            if (Globals._config.DetailedBooklist)
+            {
+                Book CurrBook = Globals._detailBooklist[Barcode];
+                Console.WriteLine($"{CurrBook.Callno1} {CurrBook.Callno2} {CurrBook.Name}");
+            }
         }
         else
         {
