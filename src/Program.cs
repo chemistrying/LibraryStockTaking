@@ -12,19 +12,31 @@ public static class Globals
     public static List<string> _buffer = new List<string>();
     public static List<string> _booklist = new List<string>();
     public static int[] _originalBooklistIndex = new int[_booklist.Count];
-    public static Dictionary<string, Book> _deatailBooklist = new Dictionary<string, Book>();
+    public static Dictionary<string, Book> _detailBooklist = new Dictionary<string, Book>();
 }
 
 public class Program
 {
     static void Main(string[] args)
     {
+        // Obtain UTF-8 encoding
         System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
 
+        // Change console output encoding to UTF-8
+        Console.OutputEncoding = System.Text.Encoding.UTF8;
+
+        // Load current configuration
         Globals._commands.ReloadConfig();
         SerilogCreator _serilogCreator = new SerilogCreator();
 
+        // Load default booklist
         Globals._commands.ReloadBooklist(Globals._config.DefaultBooklistLocation);
+
+        // If processing is turned on, process once now
+        if (Globals._config.AutoProcess) 
+        {
+            Globals._commands.Process(Globals._config.DefaultBooklistLocation);
+        }
         Serilog.Log.Information("All the resources has been loaded successfully.");
 
         Globals._commands.LoadSystemMessage();
