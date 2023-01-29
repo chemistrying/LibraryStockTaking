@@ -9,5 +9,6 @@
     "BlockInvalidInputs": true,
     "AutoCapitalize": true,
     "AutoZero" : true,
-    "AutoProcess": true
+    "AutoProcess": true,
+    "DetailedBooklist" : true
 }
