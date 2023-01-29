@@ -344,6 +344,12 @@ public class Commands
             Globals._booklist = Backup;
             return;
         }
+
+        // Only auto processing the new booklist if auto processing is on
+        if (Globals._config.AutoProcess)
+        {
+            Globals._commands.Process(fileLocation);
+        }
     }
 
     public void ReloadConfig()
