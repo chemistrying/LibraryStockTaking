@@ -1,5 +1,5 @@
 {
-    "DefaultBooklistLocation": "files\\booklist",
+    "DefaultBooklistLocation": "booklist",
     "DefaultSaveLocation": "foo",
     "DefaultProgramFilesLocation": "files\\",
     "LoggingLevel": "Information",
@@ -9,5 +9,5 @@
     "BlockInvalidInputs": true,
     "AutoCapitalize": true,
     "AutoZero" : true,
-    "UseDetailBooklist": true
+    "AutoProcess": true
 }
