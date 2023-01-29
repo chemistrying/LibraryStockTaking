@@ -2,7 +2,7 @@
     /reload {filelocation}  Manually load a booklist to the program.
                             Note: A specfied filelocation is REQUIRED in order to work.
                             NOTE: RELOAD FUNCTION WILL CLEAR ALL THE BOOKS LOADED IN THE PROGRAM BEFORE, AND LOAD THE ONES IN THE SPECIFIED FILELOCATION.
-                            Default booklist location is "files\\booklist".
+                            Default booklist location is "booklist".
     /config [] []           [] []: Shows the config of the current program.
                             [ConfigName] []: Shows the config value of a specific config.
                             [ConfigName] [Value]: Changes the value of a specific config.
