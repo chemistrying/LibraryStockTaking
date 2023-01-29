@@ -31,12 +31,7 @@ public class Program
 
         // Load default booklist
         Globals._commands.ReloadBooklist(Globals._config.DefaultBooklistLocation);
-
-        // If processing is turned on, process once now
-        if (Globals._config.AutoProcess) 
-        {
-            Globals._commands.Process(Globals._config.DefaultBooklistLocation);
-        }
+        
         Serilog.Log.Information("All the resources has been loaded successfully.");
 
         Globals._commands.LoadSystemMessage();
