@@ -8,13 +8,16 @@ public class Book
     public string Publisher { get; }
     public string Author { get; }
     public string Language { get; }
-    public string Type { get; }
     public string Category { get; }
 
     public Book(string[] Blocks)
     {
         for (int i = 0; i < 13; i++)
         {
+            if (Blocks[i] == "")
+            {
+                Blocks[i] = "N/A";
+            }
             switch (i)
             {
                 case 0:

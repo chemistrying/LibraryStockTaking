@@ -58,6 +58,9 @@ public class InputHandler
                 case "exist":
                     Globals._commands.Exist(args);
                     break;
+                case "search":
+                    Globals._commands.Search(args);
+                    break;
                 default:
                     Console.WriteLine("Invalid command.");
                     break;

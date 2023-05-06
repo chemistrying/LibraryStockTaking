@@ -18,7 +18,7 @@ public class Commands
         bool ok = true;
         // check if the Barcode is all numbers
         for (int i = 0; i < Barcode.Length; i++)
-        {   
+        {
             ok &= (Barcode[i] >= '0' && Barcode[i] <= '9');
         }
 
@@ -240,7 +240,8 @@ public class Commands
         string fileLocation = (Args == "" ? Globals._currentFileLocation : Args.Substring(0, Args.IndexOf(' ') == -1 ? Args.Length : Args.IndexOf(' ')));
         // string furtherArgs = Args.IndexOf(' ') == -1 ? "" : Args.Substring(Args.IndexOf(' ') + 1);
 
-        try{
+        try
+        {
             using (StreamReader sr = new StreamReader(fileLocation + ".txt"))
             {
                 int cnt = 0;
@@ -480,7 +481,7 @@ public class Commands
             Console.WriteLine("You must provide the input booklist and the output location in order to work.");
             return;
         }
-        
+
         string Input = Args + ".txt";
 
         using (StreamReader sr = new StreamReader(Input))
@@ -507,6 +508,19 @@ public class Commands
         long StartTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 
         string Location = Globals._config.DefaultProgramFilesLocation + Args;
+
+        // Test the validity of the folder
+        try
+        {
+            string[] Test = Directory.GetFiles(Location);
+        }
+        catch
+        {
+            Serilog.Log.Warning($"The directory {Location} is invalid.");
+            Console.WriteLine("The directory is invalid.");
+            return;
+        }
+
         string[] FileNames = Directory.GetFiles(Location);
         if (FileNames.Length == 0)
         {
@@ -536,7 +550,8 @@ public class Commands
 
             using (StreamReader sr = new StreamReader(FileName))
             {
-                while (!sr.EndOfStream){
+                while (!sr.EndOfStream)
+                {
                     string Temp = AutoFormat(sr.ReadLine());
                     // Console.WriteLine(Temp);
 
@@ -555,7 +570,7 @@ public class Commands
                 }
             }
         }
-        
+
         Console.WriteLine($"Merged a total of {Barcodes.Count} barcode(s).");
         Console.WriteLine($"Found {TotalBarcodes - InvalidCnt - Barcodes.Count} duplicated barcode(s).");
         Console.WriteLine($"Found {InvalidCnt} invalid barcodes(s).");
@@ -592,7 +607,8 @@ public class Commands
             {
                 using (StreamWriter sw = new StreamWriter(Globals._config.DefaultProgramFilesLocation + "StockTakingData_02082022.txt"))
                 {
-                    while (!sr.EndOfStream){
+                    while (!sr.EndOfStream)
+                    {
                         string Temp = AutoFormat(sr.ReadLine());
                         if (!CheckDuplicated.Contains(Temp))
                         {
@@ -619,5 +635,24 @@ public class Commands
 
         long EndTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
         Console.WriteLine($"Used {Math.Round(EndTime / 1000.0 - StartTime / 1000.0, 3)} second(s) to check existence.");
+    }
+
+    /* 
+        Search a book using its barcode and return all the related information
+    */
+    public void Search(string Args)
+    {
+        // Check the validity of the barcode
+        int Pos = Position(Args);
+        if (Pos == -1)
+        {
+            Serilog.Log.Warning($"{Args} can't be found in the booklist.");
+            Console.WriteLine("The book can't be found in the booklist. Please check if you have typed the barcode correcly.");
+        }
+        else
+        {
+            Book CurrentBook = Globals._detailBooklist[Args];
+            Console.WriteLine($"{CurrentBook.Acno} | {CurrentBook.Callno1} | {CurrentBook.Callno2} | {CurrentBook.Name} | {CurrentBook.Status} | {CurrentBook.Publisher} | {CurrentBook.Author} | {CurrentBook.Language} | {CurrentBook.Category}");
+        }
     }
 }
