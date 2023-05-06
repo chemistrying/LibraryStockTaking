@@ -82,7 +82,7 @@ public class Commands
                 try
                 {
                     Book CurrBook = Globals._detailBooklist[Barcode];
-                    Console.WriteLine($"{CurrBook.Callno1} {CurrBook.Callno2} {CurrBook.Name}");
+                    Console.WriteLine($"-> [ {CurrBook.Callno1} | {CurrBook.Callno2} | {CurrBook.Name} ]");
                 }
                 catch
                 {
