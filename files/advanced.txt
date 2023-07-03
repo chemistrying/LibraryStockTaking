@@ -8,4 +8,4 @@
                             [ConfigName] [Value]: Changes the value of a specific config.
     /version                Recall the version of the program. Same as "/config version".
     /exist {folderlocation} Check all text files in a folder and check all inputs' validility, uniqueness, and amount. 
-    /search {barcpde}       Returns the detailed information of a book.
+    /search {barcode}       Returns the detailed information of a book.
