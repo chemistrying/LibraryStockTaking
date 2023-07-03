@@ -2,9 +2,10 @@ using System.Text;
 
 public class Commands
 {
+    Verdict VerdictBuilder;
     public Commands()
     {
-
+        VerdictBuilder = new Verdict();
     }
 
     public void LoadSystemMessage()
@@ -59,8 +60,10 @@ public class Commands
         return Barcode;
     }
 
-    public void ReadInput(string Barcode)
+    public string ReadInput(string Barcode)
     {
+        VerdictBuilder.Reset();
+
         // Console.WriteLine($"DEBUG: {Barcode}");
         Barcode = AutoFormat(Barcode);
 
@@ -69,7 +72,8 @@ public class Commands
         {
             if (Pos == -1)
             {
-                Console.WriteLine("The previous barcode is invalid according to the booklist. Please fix it immediately.");
+                // Console.WriteLine("The previous barcode is invalid according to the booklist.");
+                VerdictBuilder.Add("The previous barcode is invalid according to the booklist.");
             }
         }
         if (Pos != -1 || !Globals._config.BlockInvalidInputs)
@@ -82,24 +86,29 @@ public class Commands
                 try
                 {
                     Book CurrBook = Globals._detailBooklist[Barcode];
-                    Console.WriteLine($"-> [ {CurrBook.Callno1} | {CurrBook.Callno2} | {CurrBook.Name} ]");
+                    // Console.WriteLine($"-> [ {CurrBook.Callno1} | {CurrBook.Callno2} | {CurrBook.Name} ]");
+                    VerdictBuilder.Add($"-> [ {CurrBook.Callno1} | {CurrBook.Callno2} | {CurrBook.Name} ]");
                 }
                 catch
                 {
                     Serilog.Log.Warning("No detailed booklist is stored in the system! Can't print book info to users!");
                     Console.WriteLine("DetailedBooklist is turned on but no detailed booklist is stored in the system. You may want to run /process {fileLocation} first to use detailed booklist or turn off detailed booklist by running command /config DetailedBooklist false.");
+                    VerdictBuilder.Add("DetailedBooklist is turned on but no detailed booklist is stored in the system.");
                 }
             }
         }
         else
         {
             Console.WriteLine("The previous barcode has been automatically deleted because it is invalid according to the booklist.");
+            VerdictBuilder.Add("The previous barcode has been automatically deleted because it is invalid according to the booklist.");
         }
         Serilog.Log.Debug($"Barcode {Barcode} has been processed successfully.");
+        return VerdictBuilder.ReturnFeedback();
     }
 
-    public void Del(int Args)
+    public string Del(int Args)
     {
+        VerdictBuilder.Reset();
         if (Args == 0)
         {
             // Remove last book
@@ -107,7 +116,8 @@ public class Commands
             {
                 Console.Beep();
                 Serilog.Log.Warning("Nothing to delete. Going to cancel this delete operation.");
-                Console.WriteLine("There is nothing for you to delete.");
+                // Console.WriteLine("There is nothing for you to delete.");
+                VerdictBuilder.Add("There is nothing for you to delete.");
             }
             else
             {
@@ -115,8 +125,10 @@ public class Commands
                 // Console.WriteLine(Globals._buffer[Globals._buffer.Count - 1]);
                 // Console.WriteLine(Globals._normalUndoStack.First().Item2[0]);
                 Globals._buffer.RemoveAt(Globals._buffer.Count - 1);
+
                 Serilog.Log.Information("Successfully delete previous input.");
-                Console.WriteLine("Deleted previous input.");
+                // Console.WriteLine("Deleted previous input.");
+                VerdictBuilder.Add("Deleted previous input.");
             }
         }
         else if (Args > 0)
@@ -124,8 +136,10 @@ public class Commands
             // Remove last x books
             Globals._normalUndoStack.Push(Tuple.Create(Args, Globals._buffer.GetRange(Math.Min(0, Globals._buffer.Count - 1 - Args), Math.Max(Globals._buffer.Count, Args))));
             Globals._buffer.RemoveRange(Math.Min(0, Globals._buffer.Count - 1 - Args), Math.Max(Globals._buffer.Count, Args));
+
             Serilog.Log.Information($"Successfully delete last {Math.Min(Globals._buffer.Count, Args)} inputs.");
-            Console.WriteLine($"Deleted last {Math.Min(Globals._buffer.Count, Args)} inputs.");
+            // Console.WriteLine($"Deleted last {Math.Min(Globals._buffer.Count, Args)} inputs.");
+            VerdictBuilder.Add($"Deleted last {Math.Min(Globals._buffer.Count, Args)} inputs.");
         }
         else
         {
@@ -134,26 +148,32 @@ public class Commands
             {
                 Console.Beep();
                 Serilog.Log.Warning($"Index is out of bound. Going to cancel this delete operation.");
-                Console.WriteLine("Index out of bound.");
+                // Console.WriteLine("Index out of bound.");
+                VerdictBuilder.Add("Index out of bound.");
             }
             else
             {
                 Globals._normalUndoStack.Push(Tuple.Create(Args, new List<string>() { Globals._buffer[Globals._buffer.Count + Args] }));
                 Globals._buffer.RemoveAt(Globals._buffer.Count + Args);
+
                 Serilog.Log.Information($"Successfully delete the {Globals._buffer.Count + Args} input");
-                Console.WriteLine($"Deleted the {Globals._buffer.Count + Args} input.");
+                // Console.WriteLine($"Deleted the {Globals._buffer.Count + Args} input.");
+                VerdictBuilder.Add($"Deleted the {Globals._buffer.Count + Args} input.");
             }
         }
+        return VerdictBuilder.ReturnFeedback();
     }
 
-    public void Save(string Args)
+    public string Save(string Args)
     {
+        VerdictBuilder.Reset();
         Serilog.Log.Debug("Trying to save files.");
         if (Globals._buffer.Count == 0)
         {
             Serilog.Log.Warning("Nothing to save. Going to cancel this save operation.");
-            Console.WriteLine("There is nothing to save.");
-            return;
+            // Console.WriteLine("There is nothing to save.");
+            VerdictBuilder.Add("There is nothing to save.");
+            return VerdictBuilder.ReturnFeedback();
         }
         string fileLocation = Args == "" ? Globals._currentFileLocation : Args.Substring(0, Args.IndexOf(' ') == -1 ? Args.Length : Args.IndexOf(' '));
         string furtherArgs = Args.IndexOf(' ') == -1 ? "" : Args.Substring(Args.IndexOf(' ') + 1);
@@ -170,8 +190,9 @@ public class Commands
             if (Confirm == "N")
             {
                 Serilog.Log.Information("Save operation has been cancelled safely.");
-                Console.WriteLine("Save operation cancelled.");
-                return;
+                // Console.WriteLine("Save operation cancelled.");
+                VerdictBuilder.Add("Save operation cancelled.");
+                return VerdictBuilder.ReturnFeedback();
             }
         }
 
@@ -183,15 +204,20 @@ public class Commands
         Serilog.Log.Information($"Successfully save inputs to \"{fileLocation}.txt\".");
         Serilog.Log.Debug($"Inputs saved: {string.Join(", ", Globals._buffer)}");
 
-        Console.WriteLine($"Successfully saved to \"{fileLocation}.txt\".");
+        // Console.WriteLine($"Successfully saved to \"{fileLocation}.txt\".");
+        VerdictBuilder.Add($"Successfully saved to \"{fileLocation}.txt\".");
+
+        return VerdictBuilder.ReturnFeedback();
     }
 
-    public void Undo()
+    public string Undo()
     {
+        VerdictBuilder.Reset();
         if (Globals._normalUndoStack.Count == 0)
         {
             Serilog.Log.Information("Nothing to undo. Going to cancel this undo operation.");
-            Console.WriteLine("There is nothing to undo.");
+            // Console.WriteLine("There is nothing to undo.");
+            VerdictBuilder.Add("There is nothing to undo.");
         }
         else
         {
@@ -214,29 +240,40 @@ public class Commands
             }
             Globals._normalUndoStack.Pop();
             Serilog.Log.Information("Successfully undid.");
-            Console.WriteLine("Undid last delete operation.");
+            // Console.WriteLine("Undid last delete operation.");
+            VerdictBuilder.Add("Undid last delete operation.");
         }
 
+        return VerdictBuilder.ReturnFeedback();
     }
 
-    public void Help(string Args)
+    public string Help(string Args)
     {
+        VerdictBuilder.Reset();
         bool Basic = Args.ToLower() == "basic";
         bool Advanced = Args.ToLower() == "advanced";
-        Console.WriteLine(File.ReadAllText(Globals._config.DefaultProgramFilesLocation + "help.txt"));
+        // Console.WriteLine(File.ReadAllText(Globals._config.DefaultProgramFilesLocation + "help.txt"));
+        VerdictBuilder.Add(File.ReadAllText(Globals._config.DefaultProgramFilesLocation + "help.txt"));
+
         if (Basic || !(Basic | Advanced))
         {
-            Console.WriteLine(File.ReadAllText(Globals._config.DefaultProgramFilesLocation + "basic.txt"));
+            // Console.WriteLine(File.ReadAllText(Globals._config.DefaultProgramFilesLocation + "basic.txt"));
+            VerdictBuilder.Add(File.ReadAllText(Globals._config.DefaultProgramFilesLocation + "basic.txt"));
         }
         if (Advanced || !(Basic | Advanced))
         {
-            Console.WriteLine(File.ReadAllText(Globals._config.DefaultProgramFilesLocation + "advanced.txt"));
+            // Console.WriteLine(File.ReadAllText(Globals._config.DefaultProgramFilesLocation + "advanced.txt"));
+            VerdictBuilder.Add(File.ReadAllText(Globals._config.DefaultProgramFilesLocation + "advanced.txt"));
         }
         Serilog.Log.Information("Help messages have been sent successfully.");
+
+        return VerdictBuilder.ReturnFeedback();
     }
 
-    public void Count(string Args)
+    public string Count(string Args)
     {
+        VerdictBuilder.Reset();
+
         string fileLocation = (Args == "" ? Globals._currentFileLocation : Args.Substring(0, Args.IndexOf(' ') == -1 ? Args.Length : Args.IndexOf(' ')));
         // string furtherArgs = Args.IndexOf(' ') == -1 ? "" : Args.Substring(Args.IndexOf(' ') + 1);
 
@@ -252,14 +289,18 @@ public class Commands
                 }
                 Serilog.Log.Information($"Successfully count the number of books in \"{fileLocation}.txt\".");
                 Serilog.Log.Debug($"There are {cnt} of books in \"{fileLocation}.txt\".");
-                Console.WriteLine($"Number of books in \"{fileLocation}.txt\": {cnt}");
+                // Console.WriteLine($"Number of books in \"{fileLocation}.txt\": {cnt}");
+                VerdictBuilder.Add($"Number of books in \"{fileLocation}.txt\": {cnt}");
             }
         }
         catch
         {
             Serilog.Log.Warning("Failed to count the books because the file location is invalid.");
-            Console.WriteLine("File location is not valid.");
+            // Console.WriteLine("File location is not valid.");
+            VerdictBuilder.Add("File location is not valid.");
         }
+
+        return VerdictBuilder.ReturnFeedback();
     }
 
     public int Position(string Barcode)
@@ -277,43 +318,44 @@ public class Commands
         return l > r ? -1 : (l + r) >> 1;
     }
 
-    public void Check(string Args)
-    {
-        string fileLocation = Args == "" ? Globals._currentFileLocation : Args.Substring(0, Args.IndexOf(' ') == -1 ? Args.Length : Args.IndexOf(' '));
-        Serilog.Log.Debug($"Checking {fileLocation}.txt barcodes.");
-        try
-        {
-            long StartTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            using (StreamReader sr = new StreamReader(fileLocation + ".txt"))
-            {
-                while (!sr.EndOfStream)
-                {
-                    string Barcode = sr.ReadLine();
-                    int Pos = Position(Barcode);
-                    if (Pos == -1)
-                    {
-                        Console.WriteLine($"WARNING: BOOK CODE {Barcode} NOT FOUND IN THE BOOKLIST.");
-                    }
-                    else if (Globals._config.ShowAllBooksPosition)
-                    {
-                        Console.WriteLine($"Found Book {Barcode} in booklist position of {Globals._originalBooklistIndex[Pos]}.");
-                    }
-                }
-            }
-            long EndTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            Serilog.Log.Information($"Successfully check all books in \"{fileLocation}\".txt.");
-            Serilog.Log.Debug($"Checking time in \"{fileLocation}\".txt: {Math.Round(EndTime / 1000.0 - StartTime / 1000.0, 3)} second(s).");
-            Console.WriteLine($"Successfully check all the books in \"{fileLocation}.txt\" in {Math.Round(EndTime / 1000.0 - StartTime / 1000.0, 3)} second(s).");
-        }
-        catch
-        {
-            Serilog.Log.Warning("Can't check the books because the file location is not valid.");
-            Console.WriteLine("File location is not valid.");
-        }
-    }
+    // public string Check(string Args)
+    // {
+    //     string fileLocation = Args == "" ? Globals._currentFileLocation : Args.Substring(0, Args.IndexOf(' ') == -1 ? Args.Length : Args.IndexOf(' '));
+    //     Serilog.Log.Debug($"Checking {fileLocation}.txt barcodes.");
+    //     try
+    //     {
+    //         long StartTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+    //         using (StreamReader sr = new StreamReader(fileLocation + ".txt"))
+    //         {
+    //             while (!sr.EndOfStream)
+    //             {
+    //                 string Barcode = sr.ReadLine();
+    //                 int Pos = Position(Barcode);
+    //                 if (Pos == -1)
+    //                 {
+    //                     Console.WriteLine($"WARNING: BOOK CODE {Barcode} NOT FOUND IN THE BOOKLIST.");
+    //                 }
+    //                 else if (Globals._config.ShowAllBooksPosition)
+    //                 {
+    //                     Console.WriteLine($"Found Book {Barcode} in booklist position of {Globals._originalBooklistIndex[Pos]}.");
+    //                 }
+    //             }
+    //         }
+    //         long EndTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+    //         Serilog.Log.Information($"Successfully check all books in \"{fileLocation}\".txt.");
+    //         Serilog.Log.Debug($"Checking time in \"{fileLocation}\".txt: {Math.Round(EndTime / 1000.0 - StartTime / 1000.0, 3)} second(s).");
+    //         Console.WriteLine($"Successfully check all the books in \"{fileLocation}.txt\" in {Math.Round(EndTime / 1000.0 - StartTime / 1000.0, 3)} second(s).");
+    //     }
+    //     catch
+    //     {
+    //         Serilog.Log.Warning("Can't check the books because the file location is not valid.");
+    //         Console.WriteLine("File location is not valid.");
+    //     }
+    // }
 
-    public void ReloadBooklist(string Args)
+    public string ReloadBooklist(string Args)
     {
+        VerdictBuilder.Reset();
         // backup the booklist
         List<string> Backup = Globals._booklist;
         // clear the booklist
@@ -344,14 +386,16 @@ public class Commands
                 }
             }
             Serilog.Log.Information("Booklist loaded successfully.");
-            Console.WriteLine("Booklist has been successfully reloaded.");
+            // Console.WriteLine("Booklist has been successfully reloaded.");
+            VerdictBuilder.Add("Booklist has been successfully reloaded.");
         }
         catch
         {
             Serilog.Log.Warning("Reload unsuccessful becaue the file location is invalid.");
-            Console.WriteLine("File location is invalid.");
+            // Console.WriteLine("File location is invalid.");
+            VerdictBuilder.Add("File location is invalid.");
             Globals._booklist = Backup;
-            return;
+            return VerdictBuilder.ReturnFeedback();
         }
 
         // Only auto processing the new booklist if auto processing is on
@@ -359,6 +403,8 @@ public class Commands
         {
             Globals._commands.Process(fileLocation);
         }
+
+        return VerdictBuilder.ReturnFeedback();
     }
 
     public void ReloadConfig()
@@ -385,8 +431,9 @@ public class Commands
         }
     }
 
-    public void Config(string Args)
+    public string Config(string Args)
     {
+        VerdictBuilder.Reset();
         int Pos = Args.IndexOf(' ');
         string ConfigName = Pos == -1 ? Args : Args.Substring(0, Pos);
         if (Args == "")
@@ -396,14 +443,16 @@ public class Commands
             Dictionary<string, dynamic> NewConfig = json.ToObject(typeof(Dictionary<string, dynamic>));
             foreach (KeyValuePair<string, dynamic> Item in NewConfig)
             {
-                Console.WriteLine($"{Item.Key}: {Item.Value}");
+                // Console.WriteLine($"{Item.Key}: {Item.Value}");
+                VerdictBuilder.Add($"{Item.Key}: {Item.Value}");
             }
             Serilog.Log.Information("Config options and values has been listed successfully.");
         }
         else if (!Globals._config.Options.Contains(ConfigName))
         {
             Serilog.Log.Warning($"Configuration name {ConfigName} is invalid.");
-            Console.WriteLine("Configuration Name is wrong. Please check if there are any spelling mistakes.");
+            // Console.WriteLine("Configuration Name is wrong. Please check if there are any spelling mistakes.");
+            VerdictBuilder.Add("Configuration Name is wrong. Please check if there are any spelling mistakes.");
         }
         else
         {
@@ -412,7 +461,8 @@ public class Commands
             Dictionary<string, dynamic> NewConfig = json.ToObject(typeof(Dictionary<string, dynamic>));
             if (Pos == -1)
             {
-                Console.WriteLine($"{ConfigName}: {NewConfig[ConfigName]}");
+                // Console.WriteLine($"{ConfigName}: {NewConfig[ConfigName]}");
+                VerdictBuilder.Add($"{ConfigName}: {NewConfig[ConfigName]}");
             }
             else
             {
@@ -426,8 +476,9 @@ public class Commands
                     catch
                     {
                         Serilog.Log.Warning($"Value {Value} for {ConfigName} is invalid.");
-                        Console.WriteLine("The value is invalid.");
-                        return;
+                        // Console.WriteLine("The value is invalid.");
+                        VerdictBuilder.Add("The value is invalid.");
+                        return VerdictBuilder.ReturnFeedback();
                     }
                 }
                 else
@@ -435,12 +486,15 @@ public class Commands
                     Serilog.Log.Information($"Old value {NewConfig[ConfigName]} for {ConfigName} is changing to new value {Value}.");
                     NewConfig[ConfigName] = Value;
                 }
-                Console.WriteLine($"Successfully changed {ConfigName} value to {Value}.");
+                // Console.WriteLine($"Successfully changed {ConfigName} value to {Value}.");
+                VerdictBuilder.Add($"Successfully changed {ConfigName} value to {Value}.");
             }
             Serilog.Log.Debug($"Updating to new config.");
             File.WriteAllText(Globals._config.DefaultProgramFilesLocation + "config.json", Newtonsoft.Json.JsonConvert.SerializeObject(NewConfig));
         }
         ReloadConfig();
+
+        return VerdictBuilder.ReturnFeedback();
     }
 
     public void Quit()
@@ -449,9 +503,9 @@ public class Commands
         Globals._running = false;
     }
 
-    public void Version()
+    public string Version()
     {
-        Config("Version");
+        return Config("Version");
     }
 
     /*
@@ -503,156 +557,161 @@ public class Commands
         It returns the non-existence books.
     */
 
-    public void Exist(string Args)
-    {
-        long StartTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+    // public string Exist(string Args)
+    // {
+    //     long StartTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 
-        string Location = Globals._config.DefaultProgramFilesLocation + Args;
+    //     string Location = Globals._config.DefaultProgramFilesLocation + Args;
 
-        // Test the validity of the folder
-        try
-        {
-            string[] Test = Directory.GetFiles(Location);
-        }
-        catch
-        {
-            Serilog.Log.Warning($"The directory {Location} is invalid.");
-            Console.WriteLine("The directory is invalid.");
-            return;
-        }
+    //     // Test the validity of the folder
+    //     try
+    //     {
+    //         string[] Test = Directory.GetFiles(Location);
+    //     }
+    //     catch
+    //     {
+    //         Serilog.Log.Warning($"The directory {Location} is invalid.");
+    //         Console.WriteLine("The directory is invalid.");
+    //         return;
+    //     }
 
-        string[] FileNames = Directory.GetFiles(Location);
-        if (FileNames.Length == 0)
-        {
-            Serilog.Log.Warning($"There are no files in the directory {Location}.");
-            Console.WriteLine("There are no files in the directory.");
-        }
+    //     string[] FileNames = Directory.GetFiles(Location);
+    //     if (FileNames.Length == 0)
+    //     {
+    //         Serilog.Log.Warning($"There are no files in the directory {Location}.");
+    //         Console.WriteLine("There are no files in the directory.");
+    //     }
 
-        int TotalBarcodes = 0; // Include invalid, duplicated
-        HashSet<string> Barcodes = new HashSet<string>();
-        bool[] Existence = new bool[Globals._booklist.Count];
-        int InvalidCnt = 0; // Include duplicated invalid barcodes
+    //     int TotalBarcodes = 0; // Include invalid, duplicated
+    //     HashSet<string> Barcodes = new HashSet<string>();
+    //     bool[] Existence = new bool[Globals._booklist.Count];
+    //     int InvalidCnt = 0; // Include duplicated invalid barcodes
 
-        HashSet<KeyValuePair<int, string>> Invalids = new HashSet<KeyValuePair<int, string>>();
+    //     HashSet<KeyValuePair<int, string>> Invalids = new HashSet<KeyValuePair<int, string>>();
 
-        foreach (string FileName in FileNames)
-        {
-            if (FileName.Length < 4)
-            {
-                continue;
-            }
-            else if (FileName.Substring(FileName.Length - 4) != ".txt")
-            {
-                continue;
-            }
+    //     foreach (string FileName in FileNames)
+    //     {
+    //         if (FileName.Length < 4)
+    //         {
+    //             continue;
+    //         }
+    //         else if (FileName.Substring(FileName.Length - 4) != ".txt")
+    //         {
+    //             continue;
+    //         }
 
-            // Console.WriteLine(FileName); 
+    //         // Console.WriteLine(FileName); 
 
-            using (StreamReader sr = new StreamReader(FileName))
-            {
-                while (!sr.EndOfStream)
-                {
-                    string Temp = AutoFormat(sr.ReadLine());
-                    // Console.WriteLine(Temp);
+    //         using (StreamReader sr = new StreamReader(FileName))
+    //         {
+    //             while (!sr.EndOfStream)
+    //             {
+    //                 string Temp = AutoFormat(sr.ReadLine());
+    //                 // Console.WriteLine(Temp);
 
-                    int Pos = Position(Temp);
-                    if (Pos != -1)
-                    {
-                        Barcodes.Add(Temp);
-                        Existence[Pos] = true;
-                    }
-                    else
-                    {
-                        Invalids.Add(new KeyValuePair<int, string>(TotalBarcodes + 1, Temp));
-                        InvalidCnt++;
-                    }
-                    TotalBarcodes++;
-                }
-            }
-        }
+    //                 int Pos = Position(Temp);
+    //                 if (Pos != -1)
+    //                 {
+    //                     Barcodes.Add(Temp);
+    //                     Existence[Pos] = true;
+    //                 }
+    //                 else
+    //                 {
+    //                     Invalids.Add(new KeyValuePair<int, string>(TotalBarcodes + 1, Temp));
+    //                     InvalidCnt++;
+    //                 }
+    //                 TotalBarcodes++;
+    //             }
+    //         }
+    //     }
 
-        Console.WriteLine($"Merged a total of {Barcodes.Count} barcode(s).");
-        Console.WriteLine($"Found {TotalBarcodes - InvalidCnt - Barcodes.Count} duplicated barcode(s).");
-        Console.WriteLine($"Found {InvalidCnt} invalid barcodes(s).");
-        Console.WriteLine($"{Globals._booklist.Count - Barcodes.Count} book(s) are missing.");
+    //     Console.WriteLine($"Merged a total of {Barcodes.Count} barcode(s).");
+    //     Console.WriteLine($"Found {TotalBarcodes - InvalidCnt - Barcodes.Count} duplicated barcode(s).");
+    //     Console.WriteLine($"Found {InvalidCnt} invalid barcodes(s).");
+    //     Console.WriteLine($"{Globals._booklist.Count - Barcodes.Count} book(s) are missing.");
 
-        using (StreamWriter sw = new StreamWriter(Globals._config.DefaultProgramFilesLocation + "report.txt"))
-        {
-            for (int i = 0; i < Globals._booklist.Count; i++)
-            {
-                if (!Existence[i])
-                {
-                    sw.WriteLine(Globals._booklist[i]);
-                }
-            }
-        }
+    //     using (StreamWriter sw = new StreamWriter(Globals._config.DefaultProgramFilesLocation + "report.txt"))
+    //     {
+    //         for (int i = 0; i < Globals._booklist.Count; i++)
+    //         {
+    //             if (!Existence[i])
+    //             {
+    //                 sw.WriteLine(Globals._booklist[i]);
+    //             }
+    //         }
+    //     }
 
 
-        HashSet<string> CheckDuplicated = new HashSet<string>();
-        foreach (string FileName in FileNames)
-        {
-            if (FileName.Length < 4)
-            {
-                continue;
-            }
-            else if (FileName.Substring(FileName.Length - 4) != ".txt")
-            {
-                continue;
-            }
+    //     HashSet<string> CheckDuplicated = new HashSet<string>();
+    //     foreach (string FileName in FileNames)
+    //     {
+    //         if (FileName.Length < 4)
+    //         {
+    //             continue;
+    //         }
+    //         else if (FileName.Substring(FileName.Length - 4) != ".txt")
+    //         {
+    //             continue;
+    //         }
 
-            // Console.WriteLine(FileName);
+    //         // Console.WriteLine(FileName);
 
-            int Dup = 0;
-            using (StreamReader sr = new StreamReader(FileName))
-            {
-                using (StreamWriter sw = new StreamWriter(Globals._config.DefaultProgramFilesLocation + "StockTakingData_02082022.txt"))
-                {
-                    while (!sr.EndOfStream)
-                    {
-                        string Temp = AutoFormat(sr.ReadLine());
-                        if (!CheckDuplicated.Contains(Temp))
-                        {
-                            sw.WriteLine(Temp);
-                            CheckDuplicated.Add(Temp);
-                        }
-                        else if (Position(Temp) != -1)
-                        {
-                            Dup++;
-                        }
-                    }
-                }
-            }
-            Console.WriteLine($"Check Dup: {Dup}");
-        }
+    //         int Dup = 0;
+    //         using (StreamReader sr = new StreamReader(FileName))
+    //         {
+    //             using (StreamWriter sw = new StreamWriter(Globals._config.DefaultProgramFilesLocation + "StockTakingData_02082022.txt"))
+    //             {
+    //                 while (!sr.EndOfStream)
+    //                 {
+    //                     string Temp = AutoFormat(sr.ReadLine());
+    //                     if (!CheckDuplicated.Contains(Temp))
+    //                     {
+    //                         sw.WriteLine(Temp);
+    //                         CheckDuplicated.Add(Temp);
+    //                     }
+    //                     else if (Position(Temp) != -1)
+    //                     {
+    //                         Dup++;
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //         Console.WriteLine($"Check Dup: {Dup}");
+    //     }
 
-        using (StreamWriter sw = new StreamWriter(Globals._config.DefaultProgramFilesLocation + "invalidReport.txt"))
-        {
-            foreach (var Invalid in Invalids)
-            {
-                sw.WriteLine($"{Invalid.Key} {Invalid.Value}");
-            }
-        }
+    //     using (StreamWriter sw = new StreamWriter(Globals._config.DefaultProgramFilesLocation + "invalidReport.txt"))
+    //     {
+    //         foreach (var Invalid in Invalids)
+    //         {
+    //             sw.WriteLine($"{Invalid.Key} {Invalid.Value}");
+    //         }
+    //     }
 
-        long EndTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-        Console.WriteLine($"Used {Math.Round(EndTime / 1000.0 - StartTime / 1000.0, 3)} second(s) to check existence.");
-    }
+    //     long EndTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+    //     Console.WriteLine($"Used {Math.Round(EndTime / 1000.0 - StartTime / 1000.0, 3)} second(s) to check existence.");
+    // }
 
     /* 
         Search a book using its barcode and return all the related information
     */
-    public void Search(string Args)
+    public string Search(string Args)
     {
+        VerdictBuilder.Reset();
         // Check the validity of the barcode
         int Pos = Position(Args);
         if (Pos == -1)
         {
             Serilog.Log.Warning($"{Args} can't be found in the booklist.");
             Console.WriteLine("The book can't be found in the booklist. Please check if you have typed the barcode correcly.");
+            VerdictBuilder.Add("The book can't be found in the booklist. Please check if you have typed the barcode correcly.");
         }
         else
         {
             Book CurrentBook = Globals._detailBooklist[Args];
-            Console.WriteLine($"{CurrentBook.Acno} | {CurrentBook.Callno1} | {CurrentBook.Callno2} | {CurrentBook.Name} | {CurrentBook.Status} | {CurrentBook.Publisher} | {CurrentBook.Author} | {CurrentBook.Language} | {CurrentBook.Category}");
+            // Console.WriteLine($"{CurrentBook.Acno} | {CurrentBook.Callno1} | {CurrentBook.Callno2} | {CurrentBook.Name} | {CurrentBook.Status} | {CurrentBook.Publisher} | {CurrentBook.Author} | {CurrentBook.Language} | {CurrentBook.Category}");
+            VerdictBuilder.Add($"{CurrentBook.Acno} | {CurrentBook.Callno1} | {CurrentBook.Callno2} | {CurrentBook.Name} | {CurrentBook.Status} | {CurrentBook.Publisher} | {CurrentBook.Author} | {CurrentBook.Language} | {CurrentBook.Category}");
         }
+
+        return VerdictBuilder.ReturnFeedback();
     }
 }
