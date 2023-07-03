@@ -5,7 +5,7 @@ public class InputHandler
         
     }
 
-    public void HandleInput(string Input)
+    public string HandleInput(string Input)
     {
         if (Input.StartsWith(';'))
         {
@@ -26,49 +26,49 @@ public class InputHandler
             switch (cmd)
             {
                 case "del":
-                    Globals._commands.Del(args == "" ? 0 : Convert.ToInt32(args));
+                    // return Globals._commands.Del(args == "" ? 0 : Convert.ToInt32(args));
+                    // make it less complicated
+                    return Globals._commands.Del(0);
                     break;
                 case "save":
-                    Globals._commands.Save(args);
+                    return Globals._commands.Save(args);
                     break;
                 case "undo":
-                    Globals._commands.Undo();
+                    return Globals._commands.Undo();
                     break;
                 case "help":
-                    Globals._commands.Help(args);
+                    return Globals._commands.Help(args);
                     break;
                 case "count":
-                    Globals._commands.Count(args);
+                    return Globals._commands.Count(args);
                     break;
-                case "check":
-                    Globals._commands.Check(args);
-                    break;
+                // case "check":
+                //     return Globals._commands.Check(args);
+                //     break;
                 case "reload":
-                    Globals._commands.ReloadBooklist(args);
+                    return Globals._commands.ReloadBooklist(args);
                     break;
                 case "config":
-                    Globals._commands.Config(args);
+                    return Globals._commands.Config(args);
                     break;
-                case "quit":
-                    Globals._commands.Quit();
-                    break;
+                // case "quit":
+                //     return Globals._commands.Quit();
+                //     break;
                 case "version":
-                    Globals._commands.Version();
+                    return Globals._commands.Version();
                     break;
-                case "exist":
-                    Globals._commands.Exist(args);
-                    break;
+                // case "exist":
+                //     return Globals._commands.Exist(args);
+                //     break;
                 case "search":
-                    Globals._commands.Search(args);
+                    return Globals._commands.Search(args);
                     break;
                 default:
-                    Console.WriteLine("Invalid command.");
+                    return "Invalid Command";
                     break;
             }
         }
-        else
-        {
-            Globals._commands.ReadInput(Globals._format.GetFormat(Input));
-        }
+        
+        return Globals._commands.ReadInput(Globals._format.GetFormat(Input));
     }
 }
