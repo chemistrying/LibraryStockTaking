@@ -37,6 +37,52 @@ public class Program
 
 	public static Task Main(string[] args) => new Program().MainAsync();
 
+    public List<SlashCommandBuilder> RegisterCommand()
+    {
+        return new List<SlashCommandBuilder>
+        {
+            // Help command
+            new SlashCommandBuilder()
+                .WithName("help")
+                .WithDescription("This is my help command!"),
+            // Echo command
+            new SlashCommandBuilder()
+                .WithName("echo")
+                .WithDescription("An echo chamber")
+                .AddOption("message", ApplicationCommandOptionType.String, "The message you want to echo", isRequired: true),
+            // Del command
+            new SlashCommandBuilder()
+                .WithName("del")
+                .WithDescription("Delete previous entry"),
+            // Undo command
+            new SlashCommandBuilder()
+                .WithName("undo")
+                .WithDescription("Undo a delete operation"),
+            // Count command
+            new SlashCommandBuilder()
+                .WithName("count")
+                .WithDescription("Count the number of books entered in this channel"),
+            // Version command
+            new SlashCommandBuilder()
+                .WithName("version")
+                .WithDescription("Obtain the version of this software / bot"),
+            // Search command
+            new SlashCommandBuilder()
+                .WithName("search")
+                .WithDescription("Search a book")
+                .AddOption("barcode", ApplicationCommandOptionType.String, "The barcode (ACNO) of the book", isRequired: true),
+            // Start command
+            new SlashCommandBuilder()
+                .WithName("start")
+                .WithDescription("Start a stock taking procedure")
+                .AddOption("channel_name", ApplicationCommandOptionType.String, "The name of the bookshelf", isRequired: true),
+            // Finish command
+            new SlashCommandBuilder()
+                .WithName("finish")
+                .WithDescription("Finish a stock taking procedure"),
+        };
+    }
+
     public async Task Client_Ready()
     {
         // Let's build a guild command! We're going to need a guild so lets just put that in a variable.
@@ -44,17 +90,7 @@ public class Program
 
         // Next, lets create our slash command builder. This is like the embed builder but for slash commands.
         // var PingCommand = new SlashCommandBuilder().WithName("ping").WithDescription("Pong!");
-        var HelpCommand = new SlashCommandBuilder()
-            .WithName("help")
-            .WithDescription("This is my help command!");
-        var EchoCommand = new SlashCommandBuilder()
-            .WithName("echo")
-            .WithDescription("An echo chamber")
-            .AddOption("message", ApplicationCommandOptionType.String, "The message you want to echo", isRequired: true);
-        var StartCommand = new SlashCommandBuilder()
-            .WithName("start")
-            .WithDescription("Start a stock taking procedure")
-            .AddOption("channel_name", ApplicationCommandOptionType.String, "The name of the bookshelf", isRequired: true);
+        Globals._commands.Prerequisiting(_client);
 
         try
         {
@@ -62,8 +98,12 @@ public class Program
             List<ApplicationCommandProperties> applicationCommandProperties = new();
             await _client.BulkOverwriteGlobalApplicationCommandsAsync(applicationCommandProperties.ToArray());
             // await guild.CreateApplicationCommandAsync(PingCommand.Build());
-            await guild.CreateApplicationCommandAsync(HelpCommand.Build());
-            await guild.CreateApplicationCommandAsync(EchoCommand.Build());
+
+            List<SlashCommandBuilder> CommandList = RegisterCommand();
+            foreach (var CommandBuilder in CommandList)
+            {
+                await guild.CreateApplicationCommandAsync(CommandBuilder.Build());
+            }
 
             // With global commands we don't need the guild.
             // await _client.CreateGlobalApplicationCommandAsync(globalCommand.Build());
@@ -91,7 +131,6 @@ public class Program
         Globals._commands.ReloadBooklist(Globals._config.DefaultBooklistLocation);
         
         // TODO: Load books from current stocking taking files to buffer
-
         
         Serilog.Log.Information("All the resources has been loaded successfully.");
 
@@ -131,6 +170,8 @@ public class Program
         await _client.LoginAsync(TokenType.Bot, token);
         await _client.StartAsync();
 
+        // Globals._commands.Prerequisiting(_client);
+        Serilog.Log.Information("All the data has been loaded successfully.");
         // Block this task until the program is closed.
         await Task.Delay(-1);
     }
