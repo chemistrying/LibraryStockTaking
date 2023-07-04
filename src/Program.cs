@@ -17,6 +17,7 @@ public static class Globals
     public static Dictionary<ulong, Stack<Tuple<int, List<string>>>> _normalUndoStack = new Dictionary<ulong, Stack<Tuple<int, List<string>>>>();
     public static Dictionary<ulong, List<string>> _buffer = new Dictionary<ulong, List<string>>();
     public static Dictionary<ulong, bool> _doubleChecked = new Dictionary<ulong, bool>();
+    public static Dictionary<ulong, string> _shelfName = new Dictionary<ulong, string>();
     public static List<string> _booklist = new List<string>();
     public static int[] _originalBooklistIndex = new int[_booklist.Count];
     public static Dictionary<string, Book> _detailBooklist = new Dictionary<string, Book>();
@@ -90,7 +91,7 @@ public class Program
         Globals._commands.ReloadBooklist(Globals._config.DefaultBooklistLocation);
         
         // TODO: Load books from current stocking taking files to buffer
-        
+
         
         Serilog.Log.Information("All the resources has been loaded successfully.");
 
