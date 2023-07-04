@@ -16,6 +16,25 @@ public class Commands
         Serilog.Log.Information("System message is loaded successfully.");
     }
 
+    public void Prerequisiting(DiscordSocketClient _client)
+    {
+        dynamic json = Newtonsoft.Json.JsonConvert.DeserializeObject(File.ReadAllText(Globals._config.DefaultProgramFilesLocation + "channels.json"));
+        Dictionary<string, List<ulong>> ChannelStatus = json.ToObject(typeof(Dictionary<string, List<ulong>>));
+        foreach (ulong ChannelId in ChannelStatus["Current"])
+        {
+            // if (_client.GetGuild(Globals._guildId) == null)
+            // {
+            //     Console.WriteLine("bruh");
+            // }
+            var channel = _client.GetGuild(Globals._guildId).GetChannel(ChannelId) as ITextChannel;
+            Globals._format.Add(ChannelId, new Format());
+            Globals._normalUndoStack.Add(ChannelId, new Stack<Tuple<int, List<string>>>());
+            Globals._buffer.Add(ChannelId, File.ReadAllText($"{channel.Name}.txt").Split('\n').SkipLast(1).ToList());
+            Globals._doubleChecked.Add(ChannelId, false);
+            Globals._shelfName[ChannelId] = channel.Name;
+        }
+    }
+
     public string Zeroify(string Barcode)
     {
         bool ok = true;
@@ -79,22 +98,30 @@ public class Commands
         }
         if (Pos != -1 || !Globals._config.BlockInvalidInputs)
         {
-            Globals._buffer[Source].Add(Barcode);
-
-            // Only output book information when detailed booklist is used
-            if (Globals._config.DetailedBooklist)
+            if (Globals._buffer[Source].Contains(Barcode))
             {
-                try
+                VerdictBuilder.Add($"Barcode {Barcode} has been entered!");
+            }
+            else
+            {
+                Globals._buffer[Source].Add(Barcode);
+
+                // Only output book information when detailed booklist is used
+                if (Globals._config.DetailedBooklist)
                 {
-                    Book CurrBook = Globals._detailBooklist[Barcode];
-                    // Console.WriteLine($"-> [ {CurrBook.Callno1} | {CurrBook.Callno2} | {CurrBook.Name} ]");
-                    VerdictBuilder.Add($"-> [ {CurrBook.Callno1} | {CurrBook.Callno2} | {CurrBook.Name} ]");
-                }
-                catch
-                {
-                    Serilog.Log.Warning("No detailed booklist is stored in the system! Can't print book info to users!");
-                    Console.WriteLine("DetailedBooklist is turned on but no detailed booklist is stored in the system. You may want to run /process {fileLocation} first to use detailed booklist or turn off detailed booklist by running command /config DetailedBooklist false.");
-                    VerdictBuilder.Add("DetailedBooklist is turned on but no detailed booklist is stored in the system.");
+                    try
+                    {
+                        Book CurrBook = Globals._detailBooklist[Barcode];
+                        // Console.WriteLine($"-> [ {CurrBook.Callno1} | {CurrBook.Callno2} | {CurrBook.Name} ]");
+                        Serilog.Log.Debug("Passed");
+                        VerdictBuilder.Add($"-> [ {CurrBook.Callno1} | {CurrBook.Callno2} | {CurrBook.Name} ]");
+                    }
+                    catch
+                    {
+                        Serilog.Log.Warning("No detailed booklist is stored in the system! Can't print book info to users!");
+                        Console.WriteLine("DetailedBooklist is turned on but no detailed booklist is stored in the system. You may want to run /process {fileLocation} first to use detailed booklist or turn off detailed booklist by running command /config DetailedBooklist false.");
+                        VerdictBuilder.Add("DetailedBooklist is turned on but no detailed booklist is stored in the system.");
+                    }
                 }
             }
         }
@@ -103,9 +130,10 @@ public class Commands
             Console.WriteLine("The previous barcode has been automatically deleted because it is invalid according to the booklist.");
             VerdictBuilder.Add("The previous barcode has been automatically deleted because it is invalid according to the booklist.");
         }
-        Serilog.Log.Debug($"Barcode {Barcode} has been processed successfully.");
+        Serilog.Log.Verbose($"Barcode {Barcode} has been processed successfully.");
 
         Save(Source);
+        Serilog.Log.Debug(VerdictBuilder.ReturnFeedback());
         return VerdictBuilder.ReturnFeedback();
     }
 
@@ -170,7 +198,7 @@ public class Commands
     public void Save(ulong Source)
     {
         // TODO: Autosave
-        VerdictBuilder.Reset();
+        // VerdictBuilder.Reset();
         Serilog.Log.Debug("Trying to save files.");
         if (Globals._buffer[Source].Count == 0)
         {
@@ -204,16 +232,16 @@ public class Commands
 
         string FileLocation = Globals._shelfName[Source];
 
-        File.AppendAllText(FileLocation + ".txt", string.Join("\n", Globals._buffer) + "\n");
-        Globals._buffer[Source].Clear();
-        Globals._normalUndoStack[Source].Clear();
+        File.WriteAllText(FileLocation + ".txt", string.Join("\n", Globals._buffer[Source]) + "\n");
+        // Globals._buffer[Source].Clear();
+        // Globals._normalUndoStack[Source].Clear();
 
-        Serilog.Log.Information($"Successfully save inputs to \"{FileLocation}.txt\".");
-        Serilog.Log.Debug($"Inputs saved: {string.Join(", ", Globals._buffer)}");
+        // Serilog.Log.Information($"Successfully save inputs to \"{FileLocation}.txt\".");
+        Serilog.Log.Debug($"Inputs saved: {string.Join(", ", Globals._buffer[Source])}");
 
         // Console.WriteLine($"Successfully saved to \"{fileLocation}.txt\".");
         // VerdictBuilder.Add($"Successfully saved to \"{FileLocation}.txt\".");
-
+        Globals._doubleChecked[Source] = false;
         // return VerdictBuilder.ReturnFeedback();
     }
 
@@ -309,13 +337,13 @@ public class Commands
         }
 
         // TODO: Make the value of Globals._doublChecked[ChannelId] to true
-
+        Globals._doubleChecked[Source] = true;
         return VerdictBuilder.ReturnFeedback();
     }
 
     public int Position(string Barcode)
     {
-        Serilog.Log.Debug($"Binary searching {Barcode} in the booklist.");
+        Serilog.Log.Verbose($"Binary searching {Barcode} in the booklist.");
         int l = 0, r = Globals._booklist.Count - 1;
         while (l <= r)
         {
@@ -324,7 +352,7 @@ public class Commands
             else if (String.Compare(Globals._booklist[m], Barcode) < 0) l = m + 1;
             else r = m - 1;
         }
-        Serilog.Log.Debug($"Binary searched {Barcode} in position {(l > r ? -1 : (l + r) >> 1)}");
+        Serilog.Log.Verbose($"Binary searched {Barcode} in position {(l > r ? -1 : (l + r) >> 1)}");
         return l > r ? -1 : (l + r) >> 1;
     }
 
@@ -724,9 +752,9 @@ public class Commands
         return VerdictBuilder.ReturnFeedback();
     }
 
-    public string Start(string Args, DiscordSocketClient _client)
+    public async Task Start(string Args, DiscordSocketClient _client)
     {
-        VerdictBuilder.Reset();
+        // VerdictBuilder.Reset();
 
         // format the name
         Args = Args.ToUpper();
@@ -736,15 +764,14 @@ public class Commands
         var Channel = _client.GetGuild(Globals._guildId).Channels.SingleOrDefault(x => x.Name == Args);
         if (Channel == null) 
         {
-            _client.GetGuild(Globals._guildId).CreateTextChannelAsync(Args, x => x.CategoryId = Globals._currentShelvesGroupId);
-            var NewChannel = _client.GetGuild(Globals._guildId).Channels.SingleOrDefault(x => x.Name == Args);
+            var NewChannel = await _client.GetGuild(Globals._guildId).CreateTextChannelAsync(Args, x => x.CategoryId = Globals._currentShelvesGroupId);
             ulong NewChannelId = NewChannel.Id;
             Serilog.Log.Information($"Successfully create a channel with name {Args}.");
 
             // Create environment
+            Globals._format.Add(NewChannelId, new Format());
             Globals._normalUndoStack.Add(NewChannelId, new Stack<Tuple<int, List<string>>>());
             Globals._buffer.Add(NewChannelId, new List<string>());
-            Globals._format.Add(NewChannelId, new Format());
             Globals._doubleChecked.Add(NewChannelId, false);
             Globals._shelfName.Add(NewChannelId, Args);
             Serilog.Log.Information($"Successfully create environment for bookshelf {NewChannelId}.");
@@ -752,36 +779,47 @@ public class Commands
             // Record this channel as current stock taking shelf
             dynamic json = Newtonsoft.Json.JsonConvert.DeserializeObject(File.ReadAllText(Globals._config.DefaultProgramFilesLocation + "channels.json"));
             Dictionary<string, List<ulong>> NewChannelStatus = json.ToObject(typeof(Dictionary<string, List<ulong>>));
-            NewChannelStatus["Current"].Append(NewChannelId);
+            NewChannelStatus["Current"].Add(NewChannelId);
+            // Console.WriteLine(NewChannelStatus["Current"].First());
             File.WriteAllText(Globals._config.DefaultProgramFilesLocation + "channels.json", Newtonsoft.Json.JsonConvert.SerializeObject(NewChannelStatus));
             Serilog.Log.Information($"Updated current stock taking channel status.");
 
-            VerdictBuilder.Add($"Successfully created a new stock taking channel with name {Args}.");
+            // VerdictBuilder.Add($"Successfully created a new stock taking channel with name {Args}.");
         }
         else
         {
             Serilog.Log.Warning($"Channel {Args} already exists! Failed to create the above channel.");
-            VerdictBuilder.Add($"Channel {Args} already exists!");
+            // VerdictBuilder.Add($"Channel {Args} already exists!");
         }
 
-        return VerdictBuilder.ReturnFeedback();
+        // return VerdictBuilder.ReturnFeedback();
     }
 
-    public string Finish(string Args, DiscordSocketClient _client, SocketUser User)
+    public async Task Finish(ulong Source, DiscordSocketClient _client, SocketUser User)
     {
-        VerdictBuilder.Reset();
-        var ChannelId = Convert.ToUInt64(Args);
+        // VerdictBuilder.Reset();
+        var ChannelId = Source;
         var Channel = _client.GetGuild(Globals._guildId).GetChannel(ChannelId) as ITextChannel;
+
+        if (!Globals._shelfName.Keys.Contains(ChannelId))
+        {
+            // VerdictBuilder.Add("This channel is not a stock taking channel!");
+            // return VerdictBuilder.ReturnFeedback();
+            return;
+        }
 
         // Should check if it's already double-checked
         if (!Globals._doubleChecked[ChannelId])
         {
-            VerdictBuilder.Add(Count(ChannelId));
+            // VerdictBuilder.Add(Count(ChannelId));
+            await Channel.SendMessageAsync("Auto running count command to check number of books...");
+            await Channel.SendMessageAsync(Count(ChannelId));
+            Globals._doubleChecked[ChannelId] = true;
         }
         else
         {
             // Discord procedures
-            Channel.ModifyAsync(x =>
+            await Channel.ModifyAsync(x =>
             {
                 x.CategoryId = Globals._archivedShelvesGroupId;
             });
@@ -803,9 +841,9 @@ public class Commands
             File.WriteAllText(Globals._config.DefaultProgramFilesLocation + "channels.json", Newtonsoft.Json.JsonConvert.SerializeObject(NewChannelStatus));
             Serilog.Log.Information($"Updated current stock taking channel status.");
 
-            VerdictBuilder.Add($"Procedure ended by user {User.Id}.");
+            // VerdictBuilder.Add($"Procedure ended by user {User.Id}.");
         }
 
-        return VerdictBuilder.ReturnFeedback();
+        // return VerdictBuilder.ReturnFeedback();
     }
 }
