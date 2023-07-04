@@ -27,6 +27,11 @@ public class SlashCommandHandler
             Resultant[Pointer] += '\n';
             Sum += Line.Count() + 1;
         }
+
+        for (int i = 0; i < Resultant.Count; i++) 
+        {
+            Resultant[i] = $"```{Resultant[i]}```";
+        }
         return Resultant;
     }
 
