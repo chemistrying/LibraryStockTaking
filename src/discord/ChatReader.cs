@@ -39,9 +39,6 @@ public class ChatReader
         var message = messageParam as SocketUserMessage;
         if (message == null) return;
 
-        // Create a number to track where the prefix ends and the command begins
-        int argPos = 0;
-
         // Create a WebSocket-based command context based on the message
         var context = new SocketCommandContext(_client, message);
 
@@ -52,9 +49,9 @@ public class ChatReader
         }
         else
         {
-            Console.WriteLine(messageParam.Content);
+            Serilog.Log.Debug(messageParam.Content);
             // await context.Channel.SendMessageAsync($"Received message \"{messageParam.Content}\".");
-            await context.Channel.SendMessageAsync(Globals._commands.ReadInput(messageParam.Content));
+            await context.Channel.SendMessageAsync(Globals._inputHandler.HandleInput(messageParam.Content, context.Channel.Id, _client, messageParam.Author));
         }
     }
 }
