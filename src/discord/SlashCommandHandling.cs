@@ -3,8 +3,11 @@ using Discord.WebSocket;
 
 public class SlashCommandHandler
 {
+    private DiscordSocketClient _client;
+
     public SlashCommandHandler(DiscordSocketClient client)
     {
+        _client = client;
         client.SlashCommandExecuted += HandleSlashCommandAsync;
     }
 
@@ -28,16 +31,20 @@ public class SlashCommandHandler
             Sum += Line.Count() + 1;
         }
 
-        for (int i = 0; i < Resultant.Count; i++) 
+        if (Resultant.Count > 1)
         {
-            Resultant[i] = $"```{Resultant[i]}```";
+            for (int i = 0; i < Resultant.Count; i++) 
+            {
+                Resultant[i] = $"```{Resultant[i]}```";
+            }
         }
+        
         return Resultant;
     }
 
     public async Task HandleSlashCommandAsync(SocketSlashCommand command)
     {
-        string Result = Globals._inputHandler.HandleInput("/" + command.Data.Name);
+        string Result = Globals._inputHandler.HandleInput("/" + command.Data.Name, command.Channel.Id, _client, command.User);
         Console.WriteLine(Result);
         // Need to slice results
         List<string> SlicedResponses = SlicedResponse(Result);
