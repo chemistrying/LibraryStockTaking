@@ -29,47 +29,34 @@ public class InputHandler
                     // return Globals._commands.Del(args == "" ? 0 : Convert.ToInt32(args));
                     // make it less complicated
                     return Globals._commands.Del(0, Source);
-                    break;
                 // case "save":
                 //     return Globals._commands.Save(args);
                 //     break;
                 case "undo":
                     return Globals._commands.Undo(Source);
-                    break;
                 case "help":
                     return Globals._commands.Help(args);
-                    break;
                 case "count":
                     return Globals._commands.Count(Source);
-                    break;
                 // case "check":
                 //     return Globals._commands.Check(args);
                 //     break;
                 case "reload":
                     return Globals._commands.ReloadBooklist(args);
-                    break;
                 case "config":
                     return Globals._commands.Config(args);
-                    break;
                 // case "quit":
                 //     return Globals._commands.Quit();
                 //     break;
                 case "version":
                     return Globals._commands.Version();
-                    break;
                 // case "exist":
                 //     return Globals._commands.Exist(args);
                 //     break;
                 case "search":
                     return Globals._commands.Search(args);
-                    break;
-                case "start":
-                    return Globals._commands.Start(args, _client);
-                case "finish":
-                    return Globals._commands.Finish(args, _client, User);
                 default:
                     return "Invalid Command";
-                    break;
             }
         }
         
