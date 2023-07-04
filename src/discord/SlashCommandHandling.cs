@@ -44,22 +44,37 @@ public class SlashCommandHandler
 
     public async Task HandleSlashCommandAsync(SocketSlashCommand command)
     {
-        string Result = Globals._inputHandler.HandleInput("/" + command.Data.Name, command.Channel.Id, _client, command.User);
-        Console.WriteLine(Result);
-        // Need to slice results
-        List<string> SlicedResponses = SlicedResponse(Result);
-
-        for (int i = 0; i < SlicedResponses.Count; i++)
+        if (command.Data.Name == "start")
         {
-            if (i == 0)
+            await Globals._commands.Start(((string)command.Data.Options.First()), _client);
+            // await command.RespondAsync($"Successfully start a shelf with name {((string)command.Data.Options.First())}.");
+        }
+        else if (command.Data.Name == "finish")
+        {
+            await Globals._commands.Finish(command.Channel.Id, _client, command.User);
+            // await command.RespondAsync($"Successfully finish this shelf.");
+        }
+        else
+        {
+            string Result = Globals._inputHandler.HandleInput($"/{command.Data.Name}", command.Channel.Id, _client, command.User);
+            Console.WriteLine(Result);
+            // Need to slice results
+            List<string> SlicedResponses = SlicedResponse(Result);
+
+            for (int i = 0; i < SlicedResponses.Count; i++)
             {
-                await command.RespondAsync(SlicedResponses[i]);
-            } 
-            else 
-            {
-                await command.Channel.SendMessageAsync(SlicedResponses[i]);
+                if (i == 0)
+                {
+                    await command.RespondAsync(SlicedResponses[i]);
+                } 
+                else 
+                {
+                    await command.Channel.SendMessageAsync(SlicedResponses[i]);
+                }
             }
         }
+
+        
         // await command.Channel.SendMessageAsync("Hi");
         // await command.RespondAsync($"You executed {command.Data.Name} with parameter {command.Data.Options.First().Value}!");
     }
