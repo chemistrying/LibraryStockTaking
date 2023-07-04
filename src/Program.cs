@@ -10,15 +10,20 @@ public static class Globals
 {
     public static string _currentFileLocation = "foo";
     public static bool _running = true;
-    public static Format _format = new Format();
+    public static Dictionary<ulong, Format> _format = new Dictionary<ulong, Format>();
     public static Config _config = new Config();
     public static InputHandler _inputHandler = new InputHandler();
     public static Commands _commands = new Commands();
-    public static Stack<Tuple<int, List<string>>> _normalUndoStack = new Stack<Tuple<int, List<string>>>();
-    public static List<string> _buffer = new List<string>();
+    public static Dictionary<ulong, Stack<Tuple<int, List<string>>>> _normalUndoStack = new Dictionary<ulong, Stack<Tuple<int, List<string>>>>();
+    public static Dictionary<ulong, List<string>> _buffer = new Dictionary<ulong, List<string>>();
+    public static Dictionary<ulong, bool> _doubleChecked = new Dictionary<ulong, bool>();
     public static List<string> _booklist = new List<string>();
     public static int[] _originalBooklistIndex = new int[_booklist.Count];
     public static Dictionary<string, Book> _detailBooklist = new Dictionary<string, Book>();
+
+    public static ulong _currentShelvesGroupId = 1125455735334125693;
+    public static ulong _archivedShelvesGroupId = 1125455612709449788;
+    public static ulong _guildId = 995823884744020079;
 }
 
 public class Program
@@ -28,22 +33,27 @@ public class Program
     private LoggingService _loggingService;
     private ChatReader _chatReader;
     private CommandService _commands;
-    private ulong guildId = 995823884744020079;
 
 	public static Task Main(string[] args) => new Program().MainAsync();
 
     public async Task Client_Ready()
     {
         // Let's build a guild command! We're going to need a guild so lets just put that in a variable.
-        var guild = _client.GetGuild(guildId);
+        var guild = _client.GetGuild(Globals._guildId);
 
         // Next, lets create our slash command builder. This is like the embed builder but for slash commands.
         // var PingCommand = new SlashCommandBuilder().WithName("ping").WithDescription("Pong!");
-        var HelpCommand = new SlashCommandBuilder().WithName("help").WithDescription("This is my help command!");
+        var HelpCommand = new SlashCommandBuilder()
+            .WithName("help")
+            .WithDescription("This is my help command!");
         var EchoCommand = new SlashCommandBuilder()
             .WithName("echo")
             .WithDescription("An echo chamber")
             .AddOption("message", ApplicationCommandOptionType.String, "The message you want to echo", isRequired: true);
+        var StartCommand = new SlashCommandBuilder()
+            .WithName("start")
+            .WithDescription("Start a stock taking procedure")
+            .AddOption("channel_name", ApplicationCommandOptionType.String, "The name of the bookshelf", isRequired: true);
 
         try
         {
@@ -79,6 +89,9 @@ public class Program
         // Load default booklist
         Globals._commands.ReloadBooklist(Globals._config.DefaultBooklistLocation);
         
+        // TODO: Load books from current stocking taking files to buffer
+        
+        
         Serilog.Log.Information("All the resources has been loaded successfully.");
 
         var _config = new DiscordSocketConfig
@@ -103,16 +116,16 @@ public class Program
 
         _client.Ready += Client_Ready;
         
-        //  You can assign your bot token to a string, and pass that in to connect.
-        //  This is, however, insecure, particularly if you plan to have your code hosted in a public repository.
         var token = File.ReadAllText("token.txt");
 
-        // Some alternative options would be to keep your token in an Environment Variable or a standalone file.
-        // var token = Environment.GetEnvironmentVariable("NameOfYourEnvironmentVariable");
-        // var token = File.ReadAllText("token.txt");
-        // var token = JsonConvert.DeserializeObject<AConfigurationClass>(File.ReadAllText("config.json")).Token;
-
         Globals._commands.LoadSystemMessage();
+
+        // var channel = _client.GetGuild(Globals._guildId).CreateTextChannelAsync("hello");
+        // var channel = _client.GetChannel(1234) as ITextChannel;
+        // await channel.ModifyAsync(x =>
+        // {
+        //     x.CategoryId = 1234;
+        // });
 
         await _client.LoginAsync(TokenType.Bot, token);
         await _client.StartAsync();
