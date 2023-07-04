@@ -1,4 +1,6 @@
 using System.Text;
+using Discord.WebSocket;
+using Discord;
 
 public class Commands
 {
@@ -50,7 +52,6 @@ public class Commands
             }
             else if (Barcode.First() == 'C' && Barcode.Length < 6)
             {
-                // Console.WriteLine("SAD");
                 // Console.WriteLine(Barcode);
                 Barcode = 'C' + Zeroify(Barcode.Substring(1));
                 // File.AppendAllText("files\\zeros.txt", Barcode + '\n');
@@ -60,7 +61,7 @@ public class Commands
         return Barcode;
     }
 
-    public string ReadInput(string Barcode)
+    public string ReadInput(string Barcode, ulong Source)
     {
         VerdictBuilder.Reset();
 
@@ -78,7 +79,7 @@ public class Commands
         }
         if (Pos != -1 || !Globals._config.BlockInvalidInputs)
         {
-            Globals._buffer.Add(Barcode);
+            Globals._buffer[Source].Add(Barcode);
 
             // Only output book information when detailed booklist is used
             if (Globals._config.DetailedBooklist)
@@ -103,16 +104,18 @@ public class Commands
             VerdictBuilder.Add("The previous barcode has been automatically deleted because it is invalid according to the booklist.");
         }
         Serilog.Log.Debug($"Barcode {Barcode} has been processed successfully.");
+
+        Save(Source);
         return VerdictBuilder.ReturnFeedback();
     }
 
-    public string Del(int Args)
+    public string Del(int Args, ulong Source)
     {
         VerdictBuilder.Reset();
         if (Args == 0)
         {
             // Remove last book
-            if (Globals._buffer.Count == 0)
+            if (Globals._buffer[Source].Count == 0)
             {
                 Console.Beep();
                 Serilog.Log.Warning("Nothing to delete. Going to cancel this delete operation.");
@@ -121,10 +124,10 @@ public class Commands
             }
             else
             {
-                Globals._normalUndoStack.Push(Tuple.Create(0, new List<string>() { Globals._buffer[Globals._buffer.Count - 1] }));
+                Globals._normalUndoStack[Source].Push(Tuple.Create(0, new List<string>() { Globals._buffer[Source][Globals._buffer[Source].Count - 1] }));
                 // Console.WriteLine(Globals._buffer[Globals._buffer.Count - 1]);
                 // Console.WriteLine(Globals._normalUndoStack.First().Item2[0]);
-                Globals._buffer.RemoveAt(Globals._buffer.Count - 1);
+                Globals._buffer[Source].RemoveAt(Globals._buffer[Source].Count - 1);
 
                 Serilog.Log.Information("Successfully delete previous input.");
                 // Console.WriteLine("Deleted previous input.");
@@ -134,17 +137,17 @@ public class Commands
         else if (Args > 0)
         {
             // Remove last x books
-            Globals._normalUndoStack.Push(Tuple.Create(Args, Globals._buffer.GetRange(Math.Min(0, Globals._buffer.Count - 1 - Args), Math.Max(Globals._buffer.Count, Args))));
-            Globals._buffer.RemoveRange(Math.Min(0, Globals._buffer.Count - 1 - Args), Math.Max(Globals._buffer.Count, Args));
+            Globals._normalUndoStack[Source].Push(Tuple.Create(Args, Globals._buffer[Source].GetRange(Math.Min(0, Globals._buffer[Source].Count - 1 - Args), Math.Max(Globals._buffer[Source].Count, Args))));
+            Globals._buffer[Source].RemoveRange(Math.Min(0, Globals._buffer[Source].Count - 1 - Args), Math.Max(Globals._buffer[Source].Count, Args));
 
-            Serilog.Log.Information($"Successfully delete last {Math.Min(Globals._buffer.Count, Args)} inputs.");
+            Serilog.Log.Information($"Successfully delete last {Math.Min(Globals._buffer[Source].Count, Args)} inputs.");
             // Console.WriteLine($"Deleted last {Math.Min(Globals._buffer.Count, Args)} inputs.");
-            VerdictBuilder.Add($"Deleted last {Math.Min(Globals._buffer.Count, Args)} inputs.");
+            VerdictBuilder.Add($"Deleted last {Math.Min(Globals._buffer[Source].Count, Args)} inputs.");
         }
         else
         {
             // Remove a specific position book
-            if (Globals._buffer.Count + Args < 0)
+            if (Globals._buffer[Source].Count + Args < 0)
             {
                 Console.Beep();
                 Serilog.Log.Warning($"Index is out of bound. Going to cancel this delete operation.");
@@ -153,67 +156,71 @@ public class Commands
             }
             else
             {
-                Globals._normalUndoStack.Push(Tuple.Create(Args, new List<string>() { Globals._buffer[Globals._buffer.Count + Args] }));
-                Globals._buffer.RemoveAt(Globals._buffer.Count + Args);
+                Globals._normalUndoStack[Source].Push(Tuple.Create(Args, new List<string>() { Globals._buffer[Source][Globals._buffer[Source].Count + Args] }));
+                Globals._buffer[Source].RemoveAt(Globals._buffer[Source].Count + Args);
 
-                Serilog.Log.Information($"Successfully delete the {Globals._buffer.Count + Args} input");
+                Serilog.Log.Information($"Successfully delete the {Globals._buffer[Source].Count + Args} input");
                 // Console.WriteLine($"Deleted the {Globals._buffer.Count + Args} input.");
-                VerdictBuilder.Add($"Deleted the {Globals._buffer.Count + Args} input.");
+                VerdictBuilder.Add($"Deleted the {Globals._buffer[Source].Count + Args} input.");
             }
         }
         return VerdictBuilder.ReturnFeedback();
     }
 
-    public string Save(string Args)
+    public void Save(ulong Source)
     {
+        // TODO: Autosave
         VerdictBuilder.Reset();
         Serilog.Log.Debug("Trying to save files.");
-        if (Globals._buffer.Count == 0)
+        if (Globals._buffer[Source].Count == 0)
         {
             Serilog.Log.Warning("Nothing to save. Going to cancel this save operation.");
             // Console.WriteLine("There is nothing to save.");
-            VerdictBuilder.Add("There is nothing to save.");
-            return VerdictBuilder.ReturnFeedback();
-        }
-        string fileLocation = Args == "" ? Globals._currentFileLocation : Args.Substring(0, Args.IndexOf(' ') == -1 ? Args.Length : Args.IndexOf(' '));
-        string furtherArgs = Args.IndexOf(' ') == -1 ? "" : Args.Substring(Args.IndexOf(' ') + 1);
-        if (furtherArgs != "-y")
-        {
-            string Confirm = "";
-            Serilog.Log.Debug("Asking for save confirmation.");
-            do
-            {
-                Console.Write($"Confirm saving into \"{fileLocation}.txt\" this file? [Y|N] ");
-                Confirm = Console.ReadLine();
-            } while (Confirm != "Y" && Confirm != "N");
-
-            if (Confirm == "N")
-            {
-                Serilog.Log.Information("Save operation has been cancelled safely.");
-                // Console.WriteLine("Save operation cancelled.");
-                VerdictBuilder.Add("Save operation cancelled.");
-                return VerdictBuilder.ReturnFeedback();
-            }
+            // VerdictBuilder.Add("There is nothing to save.");
+            // return VerdictBuilder.ReturnFeedback();
         }
 
-        File.AppendAllText(fileLocation + ".txt", string.Join("\n", Globals._buffer) + "\n");
-        Globals._buffer.Clear();
-        Globals._normalUndoStack.Clear();
-        Globals._currentFileLocation = fileLocation;
+        // string fileLocation = Args == "" ? Globals._currentFileLocation : Args.Substring(0, Args.IndexOf(' ') == -1 ? Args.Length : Args.IndexOf(' '));
+        // string furtherArgs = Args.IndexOf(' ') == -1 ? "" : Args.Substring(Args.IndexOf(' ') + 1);
+        // if (furtherArgs != "-y")
+        // {
+        //     string Confirm = "";
+        //     Serilog.Log.Debug("Asking for save confirmation.");
+        //     do
+        //     {
+        //         Console.Write($"Confirm saving into \"{fileLocation}.txt\" this file? [Y|N] ");
+        //         Confirm = Console.ReadLine();
+        //     } while (Confirm != "Y" && Confirm != "N");
 
-        Serilog.Log.Information($"Successfully save inputs to \"{fileLocation}.txt\".");
+        //     if (Confirm == "N")
+        //     {
+        //         Serilog.Log.Information("Save operation has been cancelled safely.");
+        //         // Console.WriteLine("Save operation cancelled.");
+        //         VerdictBuilder.Add("Save operation cancelled.");
+        //         return VerdictBuilder.ReturnFeedback();
+        //     }
+        // }
+
+
+        string FileLocation = Globals._shelfName[Source];
+
+        File.AppendAllText(FileLocation + ".txt", string.Join("\n", Globals._buffer) + "\n");
+        Globals._buffer[Source].Clear();
+        Globals._normalUndoStack[Source].Clear();
+
+        Serilog.Log.Information($"Successfully save inputs to \"{FileLocation}.txt\".");
         Serilog.Log.Debug($"Inputs saved: {string.Join(", ", Globals._buffer)}");
 
         // Console.WriteLine($"Successfully saved to \"{fileLocation}.txt\".");
-        VerdictBuilder.Add($"Successfully saved to \"{fileLocation}.txt\".");
+        // VerdictBuilder.Add($"Successfully saved to \"{FileLocation}.txt\".");
 
-        return VerdictBuilder.ReturnFeedback();
+        // return VerdictBuilder.ReturnFeedback();
     }
 
-    public string Undo()
+    public string Undo(ulong Source)
     {
         VerdictBuilder.Reset();
-        if (Globals._normalUndoStack.Count == 0)
+        if (Globals._normalUndoStack[Source].Count == 0)
         {
             Serilog.Log.Information("Nothing to undo. Going to cancel this undo operation.");
             // Console.WriteLine("There is nothing to undo.");
@@ -221,24 +228,24 @@ public class Commands
         }
         else
         {
-            Tuple<int, List<string>> Operation = Globals._normalUndoStack.First();
+            Tuple<int, List<string>> Operation = Globals._normalUndoStack[Source].First();
             if (Operation.Item1 == 0)
             {
-                Globals._buffer.Add(Operation.Item2[0]);
+                Globals._buffer[Source].Add(Operation.Item2[0]);
                 // Console.WriteLine(string.Join("\n", Globals._buffer));
             }
             else if (Operation.Item1 > 0)
             {
                 foreach (string Item in Operation.Item2)
                 {
-                    Globals._buffer.Add(Item);
+                    Globals._buffer[Source].Add(Item);
                 }
             }
             else
             {
-                Globals._buffer.Insert(Globals._buffer.Count + 1 + Operation.Item1, Operation.Item2[0]);
+                Globals._buffer[Source].Insert(Globals._buffer[Source].Count + 1 + Operation.Item1, Operation.Item2[0]);
             }
-            Globals._normalUndoStack.Pop();
+            Globals._normalUndoStack[Source].Pop();
             Serilog.Log.Information("Successfully undid.");
             // Console.WriteLine("Undid last delete operation.");
             VerdictBuilder.Add("Undid last delete operation.");
@@ -270,16 +277,17 @@ public class Commands
         return VerdictBuilder.ReturnFeedback();
     }
 
-    public string Count(string Args)
+    public string Count(ulong Source)
     {
+        // TODO: Command Count's argument should be fixed by system but not user
         VerdictBuilder.Reset();
 
-        string fileLocation = (Args == "" ? Globals._currentFileLocation : Args.Substring(0, Args.IndexOf(' ') == -1 ? Args.Length : Args.IndexOf(' ')));
+        string FileLocation = Globals._shelfName[Source];
         // string furtherArgs = Args.IndexOf(' ') == -1 ? "" : Args.Substring(Args.IndexOf(' ') + 1);
 
         try
         {
-            using (StreamReader sr = new StreamReader(fileLocation + ".txt"))
+            using (StreamReader sr = new StreamReader(FileLocation + ".txt"))
             {
                 int cnt = 0;
                 while (!sr.EndOfStream)
@@ -287,10 +295,10 @@ public class Commands
                     sr.ReadLine();
                     cnt++;
                 }
-                Serilog.Log.Information($"Successfully count the number of books in \"{fileLocation}.txt\".");
-                Serilog.Log.Debug($"There are {cnt} of books in \"{fileLocation}.txt\".");
+                Serilog.Log.Information($"Successfully count the number of books in \"{FileLocation}.txt\".");
+                Serilog.Log.Debug($"There are {cnt} of books in \"{FileLocation}.txt\".");
                 // Console.WriteLine($"Number of books in \"{fileLocation}.txt\": {cnt}");
-                VerdictBuilder.Add($"Number of books in \"{fileLocation}.txt\": {cnt}");
+                VerdictBuilder.Add($"Number of books in \"{FileLocation}\": {cnt}");
             }
         }
         catch
@@ -299,6 +307,8 @@ public class Commands
             // Console.WriteLine("File location is not valid.");
             VerdictBuilder.Add("File location is not valid.");
         }
+
+        // TODO: Make the value of Globals._doublChecked[ChannelId] to true
 
         return VerdictBuilder.ReturnFeedback();
     }
@@ -556,7 +566,6 @@ public class Commands
         Check every single textfile in a folder, and merge the results together
         It returns the non-existence books.
     */
-
     // public string Exist(string Args)
     // {
     //     long StartTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
@@ -710,6 +719,91 @@ public class Commands
             Book CurrentBook = Globals._detailBooklist[Args];
             // Console.WriteLine($"{CurrentBook.Acno} | {CurrentBook.Callno1} | {CurrentBook.Callno2} | {CurrentBook.Name} | {CurrentBook.Status} | {CurrentBook.Publisher} | {CurrentBook.Author} | {CurrentBook.Language} | {CurrentBook.Category}");
             VerdictBuilder.Add($"{CurrentBook.Acno} | {CurrentBook.Callno1} | {CurrentBook.Callno2} | {CurrentBook.Name} | {CurrentBook.Status} | {CurrentBook.Publisher} | {CurrentBook.Author} | {CurrentBook.Language} | {CurrentBook.Category}");
+        }
+
+        return VerdictBuilder.ReturnFeedback();
+    }
+
+    public string Start(string Args, DiscordSocketClient _client)
+    {
+        VerdictBuilder.Reset();
+
+        // format the name
+        Args = Args.ToUpper();
+
+        // TODO: should match a regex pattern
+
+        var Channel = _client.GetGuild(Globals._guildId).Channels.SingleOrDefault(x => x.Name == Args);
+        if (Channel == null) 
+        {
+            _client.GetGuild(Globals._guildId).CreateTextChannelAsync(Args, x => x.CategoryId = Globals._currentShelvesGroupId);
+            var NewChannel = _client.GetGuild(Globals._guildId).Channels.SingleOrDefault(x => x.Name == Args);
+            ulong NewChannelId = NewChannel.Id;
+            Serilog.Log.Information($"Successfully create a channel with name {Args}.");
+
+            // Create environment
+            Globals._normalUndoStack.Add(NewChannelId, new Stack<Tuple<int, List<string>>>());
+            Globals._buffer.Add(NewChannelId, new List<string>());
+            Globals._format.Add(NewChannelId, new Format());
+            Globals._doubleChecked.Add(NewChannelId, false);
+            Globals._shelfName.Add(NewChannelId, Args);
+            Serilog.Log.Information($"Successfully create environment for bookshelf {NewChannelId}.");
+
+            // Record this channel as current stock taking shelf
+            dynamic json = Newtonsoft.Json.JsonConvert.DeserializeObject(File.ReadAllText(Globals._config.DefaultProgramFilesLocation + "channels.json"));
+            Dictionary<string, List<ulong>> NewChannelStatus = json.ToObject(typeof(Dictionary<string, List<ulong>>));
+            NewChannelStatus["Current"].Append(NewChannelId);
+            File.WriteAllText(Globals._config.DefaultProgramFilesLocation + "channels.json", Newtonsoft.Json.JsonConvert.SerializeObject(NewChannelStatus));
+            Serilog.Log.Information($"Updated current stock taking channel status.");
+
+            VerdictBuilder.Add($"Successfully created a new stock taking channel with name {Args}.");
+        }
+        else
+        {
+            Serilog.Log.Warning($"Channel {Args} already exists! Failed to create the above channel.");
+            VerdictBuilder.Add($"Channel {Args} already exists!");
+        }
+
+        return VerdictBuilder.ReturnFeedback();
+    }
+
+    public string Finish(string Args, DiscordSocketClient _client, SocketUser User)
+    {
+        VerdictBuilder.Reset();
+        var ChannelId = Convert.ToUInt64(Args);
+        var Channel = _client.GetGuild(Globals._guildId).GetChannel(ChannelId) as ITextChannel;
+
+        // Should check if it's already double-checked
+        if (!Globals._doubleChecked[ChannelId])
+        {
+            VerdictBuilder.Add(Count(ChannelId));
+        }
+        else
+        {
+            // Discord procedures
+            Channel.ModifyAsync(x =>
+            {
+                x.CategoryId = Globals._archivedShelvesGroupId;
+            });
+            Serilog.Log.Information($"Successfully archive a channel with name {Channel.Name}.");
+
+            // Remove environment
+            Globals._format.Remove(ChannelId);
+            Globals._normalUndoStack.Remove(ChannelId);
+            Globals._buffer.Remove(ChannelId);
+            Globals._doubleChecked.Remove(ChannelId);
+            Globals._shelfName.Remove(ChannelId);
+            Serilog.Log.Information($"Successfully remove environment for bookshelf {ChannelId}.");
+
+            // Record this channel as archived
+            dynamic json = Newtonsoft.Json.JsonConvert.DeserializeObject(File.ReadAllText(Globals._config.DefaultProgramFilesLocation + "channels.json"));
+            Dictionary<string, List<ulong>> NewChannelStatus = json.ToObject(typeof(Dictionary<string, List<ulong>>));
+            NewChannelStatus["Current"].Remove(ChannelId);
+            NewChannelStatus["Archived"].Add(ChannelId);
+            File.WriteAllText(Globals._config.DefaultProgramFilesLocation + "channels.json", Newtonsoft.Json.JsonConvert.SerializeObject(NewChannelStatus));
+            Serilog.Log.Information($"Updated current stock taking channel status.");
+
+            VerdictBuilder.Add($"Procedure ended by user {User.Id}.");
         }
 
         return VerdictBuilder.ReturnFeedback();
