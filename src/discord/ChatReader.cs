@@ -42,12 +42,15 @@ public class ChatReader
         // Create a WebSocket-based command context based on the message
         var context = new SocketCommandContext(_client, message);
 
+        ulong ChannelId = messageParam.Channel.Id;
+
+        Serilog.Log.Debug("Received!");
         // Determine if the message is a command based on the prefix and make sure no bots trigger commands
         if (message.Author.IsBot)
         {
             return;
         }
-        else
+        else if (Globals._shelfName.Keys.Contains(ChannelId))
         {
             Serilog.Log.Debug(messageParam.Content);
             // await context.Channel.SendMessageAsync($"Received message \"{messageParam.Content}\".");
