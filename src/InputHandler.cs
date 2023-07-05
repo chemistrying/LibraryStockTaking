@@ -10,13 +10,15 @@ public class InputHandler
         if (Input.StartsWith(';'))
         {
             // format changing
+            Serilog.Log.Debug("OK");
             Globals._format[Source].Change(Input.Length == 1 ? "" : Input.Substring(1));
             Serilog.Log.Debug($"Changed input format to {Input}.");
+            return $"Changed input format to {Input}";
         }
         else if (Input.StartsWith(':'))
         {
             // Ignore format
-            Globals._commands.ReadInput(Input.Substring(1), Source);
+            return Globals._commands.ReadInput(Input.Substring(1), Source);
         }
         else if (Input.StartsWith('/'))
         {
@@ -59,9 +61,11 @@ public class InputHandler
                     return "Invalid Command";
             }
         }
-        
-        // TODO: Make formatting better, right now disable it first
-        // return Globals._commands.ReadInput(Globals._format[Source].GetFormat(Input));
-        return Globals._commands.ReadInput(Input, Source);
+        else
+        {
+            // TODO: Make formatting better, right now disable it first
+            return Globals._commands.ReadInput(Globals._format[Source].GetFormat(Input), Source);
+            // return Globals._commands.ReadInput(Input, Source);
+        }
     }
 }
