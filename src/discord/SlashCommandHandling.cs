@@ -56,7 +56,15 @@ public class SlashCommandHandler
         }
         else
         {
-            string Result = Globals._inputHandler.HandleInput($"/{command.Data.Name}", command.Channel.Id, _client, command.User);
+            string Result;
+            if (command.Data.Options.Count == 0)
+            {
+                Result = Globals._inputHandler.HandleInput($"/{command.Data.Name}", command.Channel.Id, _client, command.User);
+            }
+            else
+            {
+                Result = Globals._inputHandler.HandleInput($"/{command.Data.Name} {((string)command.Data.Options.First())}", command.Channel.Id, _client, command.User);
+            }
             Console.WriteLine(Result);
             // Need to slice results
             List<string> SlicedResponses = SlicedResponse(Result);
