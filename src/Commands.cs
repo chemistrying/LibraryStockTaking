@@ -585,6 +585,7 @@ public class Commands
                 // Book CurrBook = new Book(sr);
                 string[] Blocks = sr.ReadLine().Split("| ");
                 Book CurrBook = new Book(Blocks);
+                // Console.WriteLine(CurrBook.Name);
                 Globals._detailBooklist.Add(CurrBook.Acno, CurrBook);
             }
         }
@@ -841,6 +842,8 @@ public class Commands
             File.WriteAllText(Globals._config.DefaultProgramFilesLocation + "channels.json", Newtonsoft.Json.JsonConvert.SerializeObject(NewChannelStatus));
             Serilog.Log.Information($"Updated current stock taking channel status.");
 
+            var GeneralChannel = _client.GetGuild(Globals._guildId).GetChannel(Globals._generalChannelId) as ITextChannel;
+            await GeneralChannel.SendFileAsync($"{Channel.Name}.txt");
             // VerdictBuilder.Add($"Procedure ended by user {User.Id}.");
         }
 
