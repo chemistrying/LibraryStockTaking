@@ -22,9 +22,10 @@ public static class Globals
     public static int[] _originalBooklistIndex = new int[_booklist.Count];
     public static Dictionary<string, Book> _detailBooklist = new Dictionary<string, Book>();
 
-    public static ulong _currentShelvesGroupId = 1125455735334125693;
-    public static ulong _archivedShelvesGroupId = 1125455612709449788;
-    public static ulong _guildId = 995823884744020079;
+    public static ulong _currentShelvesGroupId = 1126023880927092766;
+    public static ulong _archivedShelvesGroupId = 1126023908542386217;
+    public static ulong _guildId = 1126023351069065248;
+    public static ulong _generalChannelId = 1126023351811448884;
 }
 
 public class Program
@@ -122,6 +123,13 @@ public class Program
 
     public async Task MainAsync()
     {
+        // Get encoding
+        // System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+        // For debug usage
+        // Console.OutputEncoding = System.Text.Encoding.UTF8;
+        // Console.WriteLine(Console.OutputEncoding.ToString());
+
+
         // Library part
         // Load current configuration
         Globals._commands.ReloadConfig();
