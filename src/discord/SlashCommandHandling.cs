@@ -47,12 +47,12 @@ public class SlashCommandHandler
         if (command.Data.Name == "start")
         {
             await Globals._commands.Start(((string)command.Data.Options.First()), _client);
-            // await command.RespondAsync($"Successfully start a shelf with name {((string)command.Data.Options.First())}.");
+            await command.RespondAsync("Executed.");
         }
         else if (command.Data.Name == "finish")
         {
             await Globals._commands.Finish(command.Channel.Id, _client, command.User);
-            // await command.RespondAsync($"Successfully finish this shelf.");
+            await command.RespondAsync("Executed.");
         }
         else
         {
