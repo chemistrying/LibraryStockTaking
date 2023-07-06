@@ -18,8 +18,25 @@ public class Commands
 
     public void Prerequisiting(DiscordSocketClient _client)
     {
-        dynamic json = Newtonsoft.Json.JsonConvert.DeserializeObject(File.ReadAllText(Globals._config.DefaultProgramFilesLocation + "channels.json"));
-        Dictionary<string, List<ulong>> ChannelStatus = json.ToObject(typeof(Dictionary<string, List<ulong>>));
+        Serilog.Log.Information("Updating current and archived channels.");
+
+        var channels = _client.GetGuild(Globals._guildId).TextChannels;
+        Dictionary<string, List<ulong>> ChannelStatus = new Dictionary<string, List<ulong>>();
+        ChannelStatus["Current"] = new List<ulong>();
+        ChannelStatus["Archived"] = new List<ulong>();
+
+        foreach (var channel in channels)
+        {
+            if (channel.Category.Id == Globals._currentShelvesGroupId)
+            {
+                ChannelStatus["Current"].Add(channel.Id);
+            } 
+            else if (channel.Category.Id == Globals._archivedShelvesGroupId)
+            {
+                ChannelStatus["Archived"].Add(channel.Id);
+            }
+        }
+        
         foreach (ulong ChannelId in ChannelStatus["Current"])
         {
             // if (_client.GetGuild(Globals._guildId) == null)
@@ -33,6 +50,10 @@ public class Commands
             Globals._doubleChecked.Add(ChannelId, false);
             Globals._shelfName[ChannelId] = channel.Name;
         }
+
+        File.WriteAllText(Globals._config.DefaultProgramFilesLocation + "channels.json", Newtonsoft.Json.JsonConvert.SerializeObject(ChannelStatus));
+
+        Serilog.Log.Information("Update successfully.");
     }
 
     public string Zeroify(string Barcode)
