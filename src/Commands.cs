@@ -46,14 +46,19 @@ public class Commands
             var channel = _client.GetGuild(Globals._guildId).GetChannel(ChannelId) as ITextChannel;
             Globals._format.Add(ChannelId, new Format());
             Globals._normalUndoStack.Add(ChannelId, new Stack<Tuple<int, List<string>>>());
-            Globals._buffer.Add(ChannelId, File.ReadAllText($"{channel.Name}.txt").Split('\n').SkipLast(1).ToList());
+            Globals._buffer.Add(ChannelId, File.ReadAllLines($"tempdoc\\{channel.Name}.txt").ToList());
             Globals._doubleChecked.Add(ChannelId, false);
-            Globals._shelfName[ChannelId] = channel.Name;
+            Globals._shelfName.Add(ChannelId, channel.Name);
+            Globals._inputBuffer.Add(ChannelId, new Queue<string>());
         }
 
         File.WriteAllText(Globals._config.DefaultProgramFilesLocation + "channels.json", Newtonsoft.Json.JsonConvert.SerializeObject(ChannelStatus));
 
         Serilog.Log.Information("Update successfully.");
+
+        // Load stocked books
+        // Console.WriteLine("HI");
+        Globals._stocker.Load(channels);
     }
 
     public string Zeroify(string Barcode)
@@ -119,12 +124,13 @@ public class Commands
         }
         if (Pos != -1 || !Globals._config.BlockInvalidInputs)
         {
-            if (Globals._buffer[Source].Contains(Barcode))
+            if (Globals._stocker.Duped(Barcode))
             {
                 VerdictBuilder.Add($"Barcode {Barcode} has been entered!");
             }
             else
             {
+                Globals._stocker.Add(Barcode);
                 Globals._buffer[Source].Add(Barcode);
 
                 // Only output book information when detailed booklist is used
@@ -135,7 +141,7 @@ public class Commands
                         Book CurrBook = Globals._detailBooklist[Barcode];
                         // Console.WriteLine($"-> [ {CurrBook.Callno1} | {CurrBook.Callno2} | {CurrBook.Name} ]");
                         Serilog.Log.Debug("Passed");
-                        VerdictBuilder.Add($"-> [ {CurrBook.Callno1} | {CurrBook.Callno2} | {CurrBook.Name} ]");
+                        VerdictBuilder.Add($"-> [ {CurrBook.Acno} | {CurrBook.Callno1} | {CurrBook.Callno2} | {CurrBook.Name} ]");
                     }
                     catch
                     {
@@ -174,8 +180,7 @@ public class Commands
             else
             {
                 Globals._normalUndoStack[Source].Push(Tuple.Create(0, new List<string>() { Globals._buffer[Source][Globals._buffer[Source].Count - 1] }));
-                // Console.WriteLine(Globals._buffer[Globals._buffer.Count - 1]);
-                // Console.WriteLine(Globals._normalUndoStack.First().Item2[0]);
+                Globals._stocker.Remove(Globals._buffer[Source].Last());
                 Globals._buffer[Source].RemoveAt(Globals._buffer[Source].Count - 1);
 
                 Serilog.Log.Information("Successfully delete previous input.");
@@ -213,6 +218,8 @@ public class Commands
                 VerdictBuilder.Add($"Deleted the {Globals._buffer[Source].Count + Args} input.");
             }
         }
+
+        Save(Source);
         return VerdictBuilder.ReturnFeedback();
     }
 
@@ -224,9 +231,6 @@ public class Commands
         if (Globals._buffer[Source].Count == 0)
         {
             Serilog.Log.Warning("Nothing to save. Going to cancel this save operation.");
-            // Console.WriteLine("There is nothing to save.");
-            // VerdictBuilder.Add("There is nothing to save.");
-            // return VerdictBuilder.ReturnFeedback();
         }
 
         // string fileLocation = Args == "" ? Globals._currentFileLocation : Args.Substring(0, Args.IndexOf(' ') == -1 ? Args.Length : Args.IndexOf(' '));
@@ -252,8 +256,7 @@ public class Commands
 
 
         string FileLocation = Globals._shelfName[Source];
-
-        File.WriteAllText(FileLocation + ".txt", string.Join("\n", Globals._buffer[Source]) + "\n");
+        File.WriteAllText($"tempdoc\\{FileLocation}.txt", string.Join("\n", Globals._buffer[Source]) + (Globals._buffer[Source].Count == 0 ? "" : "\n"));
         // Globals._buffer[Source].Clear();
         // Globals._normalUndoStack[Source].Clear();
 
@@ -281,6 +284,7 @@ public class Commands
             if (Operation.Item1 == 0)
             {
                 Globals._buffer[Source].Add(Operation.Item2[0]);
+                Globals._stocker.Add(Operation.Item2[0]);
                 // Console.WriteLine(string.Join("\n", Globals._buffer));
             }
             else if (Operation.Item1 > 0)
@@ -288,11 +292,13 @@ public class Commands
                 foreach (string Item in Operation.Item2)
                 {
                     Globals._buffer[Source].Add(Item);
+                    Globals._stocker.Add(Item);
                 }
             }
             else
             {
                 Globals._buffer[Source].Insert(Globals._buffer[Source].Count + 1 + Operation.Item1, Operation.Item2[0]);
+                Globals._stocker.Add(Operation.Item2[0]);
             }
             Globals._normalUndoStack[Source].Pop();
             Serilog.Log.Information("Successfully undid.");
@@ -336,19 +342,11 @@ public class Commands
 
         try
         {
-            using (StreamReader sr = new StreamReader(FileLocation + ".txt"))
-            {
-                int cnt = 0;
-                while (!sr.EndOfStream)
-                {
-                    sr.ReadLine();
-                    cnt++;
-                }
-                Serilog.Log.Information($"Successfully count the number of books in \"{FileLocation}.txt\".");
-                Serilog.Log.Debug($"There are {cnt} of books in \"{FileLocation}.txt\".");
-                // Console.WriteLine($"Number of books in \"{fileLocation}.txt\": {cnt}");
-                VerdictBuilder.Add($"Number of books in \"{FileLocation}\": {cnt}");
-            }
+            int cnt = File.ReadAllLines($"tempdoc\\{FileLocation}.txt").Count();
+            Serilog.Log.Information($"Successfully count the number of books in \"{FileLocation}.txt\".");
+            Serilog.Log.Debug($"There are {cnt} of books in \"{FileLocation}.txt\".");
+            // Console.WriteLine($"Number of books in \"{fileLocation}.txt\": {cnt}");
+            VerdictBuilder.Add($"Number of books in \"{FileLocation}\": {cnt}");
         }
         catch
         {
@@ -779,7 +777,7 @@ public class Commands
         // VerdictBuilder.Reset();
 
         // format the name
-        Args = Args.ToUpper();
+        Args = Args.ToLower();
 
         // TODO: should match a regex pattern
 
@@ -796,6 +794,8 @@ public class Commands
             Globals._buffer.Add(NewChannelId, new List<string>());
             Globals._doubleChecked.Add(NewChannelId, false);
             Globals._shelfName.Add(NewChannelId, Args);
+            Globals._inputBuffer.Add(NewChannelId, new Queue<string>());
+            File.WriteAllText($"tempdoc\\{Args}.txt", "");
             Serilog.Log.Information($"Successfully create environment for bookshelf {NewChannelId}.");
 
             // Record this channel as current stock taking shelf
@@ -853,6 +853,7 @@ public class Commands
             Globals._buffer.Remove(ChannelId);
             Globals._doubleChecked.Remove(ChannelId);
             Globals._shelfName.Remove(ChannelId);
+            Globals._inputBuffer.Remove(ChannelId);
             Serilog.Log.Information($"Successfully remove environment for bookshelf {ChannelId}.");
 
             // Record this channel as archived
@@ -864,10 +865,21 @@ public class Commands
             Serilog.Log.Information($"Updated current stock taking channel status.");
 
             var GeneralChannel = _client.GetGuild(Globals._guildId).GetChannel(Globals._generalChannelId) as ITextChannel;
-            await GeneralChannel.SendFileAsync($"{Channel.Name}.txt");
+            // Console.WriteLine(Channel.Name);
+            await GeneralChannel.SendFileAsync($"tempdoc\\{Channel.Name}.txt");
             // VerdictBuilder.Add($"Procedure ended by user {User.Id}.");
         }
 
         // return VerdictBuilder.ReturnFeedback();
+    }
+
+    public string Next(ulong Source)
+    {
+        if (Globals._inputBuffer[Source].Count == 0)
+        {
+            return "There are no barcodes left to iterate.";
+        }
+        string Barcode = Globals._inputBuffer[Source].Dequeue();
+        return Globals._commands.ReadInput(Globals._format[Source].GetFormat(Barcode), Source);
     }
 }
