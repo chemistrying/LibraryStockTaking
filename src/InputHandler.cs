@@ -57,6 +57,8 @@ public class InputHandler
                 //     break;
                 case "search":
                     return Globals._commands.Search(args);
+                case "next":
+                    return Globals._commands.Next(Source);
                 default:
                     return "Invalid Command";
             }

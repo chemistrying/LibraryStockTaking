@@ -4,7 +4,6 @@ using Discord.WebSocket;
 using Discord.Net;
 using Discord.Commands;
 using Newtonsoft.Json;
-using Serilog;
 
 public static class Globals
 {
@@ -18,9 +17,11 @@ public static class Globals
     public static Dictionary<ulong, List<string>> _buffer = new Dictionary<ulong, List<string>>();
     public static Dictionary<ulong, bool> _doubleChecked = new Dictionary<ulong, bool>();
     public static Dictionary<ulong, string> _shelfName = new Dictionary<ulong, string>();
+    public static Dictionary<ulong, Queue<string>> _inputBuffer = new Dictionary<ulong, Queue<string>>();
     public static List<string> _booklist = new List<string>();
     public static int[] _originalBooklistIndex = new int[_booklist.Count];
     public static Dictionary<string, Book> _detailBooklist = new Dictionary<string, Book>();
+    public static Stocker _stocker = new Stocker();
 
     public static ulong _currentShelvesGroupId = 1126023880927092766;
     public static ulong _archivedShelvesGroupId = 1126023908542386217;
@@ -46,14 +47,9 @@ public class Program
             new SlashCommandBuilder()
                 .WithName("help")
                 .WithDescription("This is my help command!"),
-            // Echo command
-            new SlashCommandBuilder()
-                .WithName("echo")
-                .WithDescription("An echo chamber")
-                .AddOption("message", ApplicationCommandOptionType.String, "The message you want to echo", isRequired: true),
             // Del command
             new SlashCommandBuilder()
-                .WithName("del")
+                .WithName("remove")
                 .WithDescription("Delete previous entry"),
             // Undo command
             new SlashCommandBuilder()
@@ -72,6 +68,10 @@ public class Program
                 .WithName("search")
                 .WithDescription("Search a book")
                 .AddOption("barcode", ApplicationCommandOptionType.String, "The barcode (ACNO) of the book", isRequired: true),
+            // next command
+            new SlashCommandBuilder()
+                .WithName("next")
+                .WithDescription("Iterate to next barcode (if any)"),
             // Start command
             new SlashCommandBuilder()
                 .WithName("start")

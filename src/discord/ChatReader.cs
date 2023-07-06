@@ -54,7 +54,21 @@ public class ChatReader
         {
             Serilog.Log.Debug(messageParam.Content);
             // await context.Channel.SendMessageAsync($"Received message \"{messageParam.Content}\".");
-            await context.Channel.SendMessageAsync(Globals._inputHandler.HandleInput(messageParam.Content, context.Channel.Id, _client, messageParam.Author));
+            ulong Source = context.Channel.Id;
+            string[] Inputs = messageParam.Content.Split('\n');
+            if (Inputs.Count() == 1) 
+            {
+                await context.Channel.SendMessageAsync(Globals._inputHandler.HandleInput(messageParam.Content, Source, _client, messageParam.Author));
+            }
+            else
+            {
+                Serilog.Log.Debug($"{Inputs.Count()}");
+                foreach (string Input in Inputs)
+                {
+                    Globals._inputBuffer[Source].Enqueue(Input);
+                }
+                await context.Channel.SendMessageAsync(Globals._commands.Next(Source));
+            }
         }
     }
 }
