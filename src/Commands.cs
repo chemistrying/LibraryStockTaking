@@ -35,6 +35,7 @@ public class Commands
             {
                 ChannelStatus["Archived"].Add(channel.Id);
             }
+            Globals._shelfName.Add(channel.Id, channel.Name);
         }
         
         foreach (ulong ChannelId in ChannelStatus["Current"])
@@ -48,7 +49,6 @@ public class Commands
             Globals._normalUndoStack.Add(ChannelId, new Stack<Tuple<int, List<string>>>());
             Globals._buffer.Add(ChannelId, File.ReadAllLines($"tempdoc\\{channel.Name}.txt").ToList());
             Globals._doubleChecked.Add(ChannelId, false);
-            Globals._shelfName.Add(ChannelId, channel.Name);
             Globals._inputBuffer.Add(ChannelId, new Queue<string>());
         }
 
@@ -130,7 +130,7 @@ public class Commands
             }
             else
             {
-                Globals._stocker.Add(Barcode);
+                Globals._stocker.Add(Barcode, Source);
                 Globals._buffer[Source].Add(Barcode);
 
                 // Only output book information when detailed booklist is used
@@ -180,7 +180,7 @@ public class Commands
             else
             {
                 Globals._normalUndoStack[Source].Push(Tuple.Create(0, new List<string>() { Globals._buffer[Source][Globals._buffer[Source].Count - 1] }));
-                Globals._stocker.Remove(Globals._buffer[Source].Last());
+                Globals._stocker.Remove(Globals._buffer[Source].Last(), Source);
                 Globals._buffer[Source].RemoveAt(Globals._buffer[Source].Count - 1);
 
                 Serilog.Log.Information("Successfully delete previous input.");
@@ -284,7 +284,7 @@ public class Commands
             if (Operation.Item1 == 0)
             {
                 Globals._buffer[Source].Add(Operation.Item2[0]);
-                Globals._stocker.Add(Operation.Item2[0]);
+                Globals._stocker.Add(Operation.Item2[0], Source);
                 // Console.WriteLine(string.Join("\n", Globals._buffer));
             }
             else if (Operation.Item1 > 0)
@@ -292,13 +292,13 @@ public class Commands
                 foreach (string Item in Operation.Item2)
                 {
                     Globals._buffer[Source].Add(Item);
-                    Globals._stocker.Add(Item);
+                    Globals._stocker.Add(Item, Source);
                 }
             }
             else
             {
                 Globals._buffer[Source].Insert(Globals._buffer[Source].Count + 1 + Operation.Item1, Operation.Item2[0]);
-                Globals._stocker.Add(Operation.Item2[0]);
+                Globals._stocker.Add(Operation.Item2[0], Source);
             }
             Globals._normalUndoStack[Source].Pop();
             Serilog.Log.Information("Successfully undid.");
@@ -882,4 +882,23 @@ public class Commands
         string Barcode = Globals._inputBuffer[Source].Dequeue();
         return Globals._commands.ReadInput(Globals._format[Source].GetFormat(Barcode), Source);
     }
-}
+
+    public string Shelf(string Barcode) {
+        return $"This book is in the following shelf: {Globals._stocker.CheckLocation(Barcode)}";
+    }
+
+    public string Skip(ulong Source) 
+    {
+        Verdict CurrVerdict = new Verdict();
+        if (Globals._inputBuffer[Source].Count == 0)
+        {
+            return "There are no barcodes left to skip.";
+        }
+        while (Globals._inputBuffer[Source].Count > 0)
+        {
+            CurrVerdict.Add(Next(Source));
+        }
+        return CurrVerdict.ReturnFeedback();
+    }
+
+}   
