@@ -54,24 +54,33 @@ public class Program
             // Undo command
             new SlashCommandBuilder()
                 .WithName("undo")
-                .WithDescription("Undo a delete operation"),
+                .WithDescription("Regrets a delete operation"),
             // Count command
             new SlashCommandBuilder()
                 .WithName("count")
-                .WithDescription("Count the number of books entered in this channel"),
+                .WithDescription("Counts the number of books entered in this channel"),
             // Version command
             new SlashCommandBuilder()
                 .WithName("version")
-                .WithDescription("Obtain the version of this software / bot"),
+                .WithDescription("Obtains the version of this software / bot"),
             // Search command
             new SlashCommandBuilder()
                 .WithName("search")
-                .WithDescription("Search a book")
+                .WithDescription("Searches a book")
                 .AddOption("barcode", ApplicationCommandOptionType.String, "The barcode (ACNO) of the book", isRequired: true),
             // next command
             new SlashCommandBuilder()
                 .WithName("next")
-                .WithDescription("Iterate to next barcode (if any)"),
+                .WithDescription("Iterates to next barcode (if any)"),
+            // shelf command
+            new SlashCommandBuilder()
+                .WithName("shelf")
+                .WithDescription("Checks the bookshelf location of the book")
+                .AddOption("barcode", ApplicationCommandOptionType.String, "The barcode (ACNO) of the book", isRequired: true),
+            // skip command
+            new SlashCommandBuilder()
+                .WithName("skip")
+                .WithDescription("Processes all the books in the buffer"),
             // Start command
             new SlashCommandBuilder()
                 .WithName("start")
