@@ -31,13 +31,13 @@ public class SlashCommandHandler
             Sum += Line.Count() + 1;
         }
 
-        if (Resultant.Count > 1)
-        {
-            for (int i = 0; i < Resultant.Count; i++) 
-            {
-                Resultant[i] = $"```{Resultant[i]}```";
-            }
-        }
+        // if (Resultant.Count > 1)
+        // {
+        //     for (int i = 0; i < Resultant.Count; i++) 
+        //     {
+        //         Resultant[i] = $"```{Resultant[i]}```";
+        //     }
+        // }
         
         return Resultant;
     }
@@ -65,7 +65,7 @@ public class SlashCommandHandler
             {
                 Result = Globals._inputHandler.HandleInput($"/{command.Data.Name} {((string)command.Data.Options.First())}", command.Channel.Id, _client, command.User);
             }
-            Console.WriteLine(Result);
+            // Console.WriteLine(Result);
             // Need to slice results
             List<string> SlicedResponses = SlicedResponse(Result);
 
