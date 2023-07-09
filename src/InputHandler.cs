@@ -59,6 +59,10 @@ public class InputHandler
                     return Globals._commands.Search(args);
                 case "next":
                     return Globals._commands.Next(Source);
+                case "shelf":
+                    return Globals._commands.Shelf(args);
+                case "skip":
+                    return Globals._commands.Skip(Source);
                 default:
                     return "Invalid Command";
             }
