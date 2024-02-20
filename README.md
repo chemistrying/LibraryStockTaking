@@ -12,10 +12,9 @@
 * Parse the booklist exported by the library system (Implemented)
 * Implement a configuration system (Implemented)
 * Use C# to implement the program (Implemented)
-
 * ~~Implement a login system to have a clearer record (Will be implemented in v2)~~ (Substituted by discord API)
 * ~~Add some basic GUI using Win32 API (Wait until main function of the program is implemented)~~ (Cancelled)
-
-* Use .NET to create fancier GUI (Will not implement shortly)
-* Put further arguments (e.g: -y) in front of values instead of behind it (Will be implemented later) 
-* Use discord API to create a more manageable stock taking system
+* ~~Use .NET to create fancier GUI (Will be implemented later~~ (Cancelled by replacing with webapp)
+* ~~Put further arguments (e.g: -y) in front of values instead of behind it (Will be implemented later)~~ (Cancelled by no longer using console-like commands)
+* Use discord API to create a more manageable stock taking system (Implemented, but with flaws (rate-limited by discord))
+* Create a webserver to handle stock taking procedures ($\text{Soon}^{\text{TM}}$)
