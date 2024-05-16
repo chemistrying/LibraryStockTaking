@@ -5,18 +5,20 @@ public class InputHandler
         
     }
 
-    public void HandleInput(string Input)
+    public string HandleInput(string Input, ulong Source, Discord.WebSocket.DiscordSocketClient _client, Discord.WebSocket.SocketUser User)
     {
         if (Input.StartsWith(';'))
         {
             // format changing
-            Globals._format.Change(Input.Length == 1 ? "" : Input.Substring(1));
+            Serilog.Log.Debug("OK");
+            Globals._format[Source].Change(Input.Length == 1 ? "" : Input.Substring(1));
             Serilog.Log.Debug($"Changed input format to {Input}.");
+            return $"Changed input format to {Input}";
         }
         else if (Input.StartsWith(':'))
         {
             // Ignore format
-            Globals._commands.ReadInput(Input.Substring(1));
+            return Globals._commands.ReadInput(Input.Substring(1), Source);
         }
         else if (Input.StartsWith('/'))
         {
@@ -26,49 +28,50 @@ public class InputHandler
             switch (cmd)
             {
                 case "del":
-                    Globals._commands.Del(args == "" ? 0 : Convert.ToInt32(args));
-                    break;
-                case "save":
-                    Globals._commands.Save(args);
-                    break;
+                    // return Globals._commands.Del(args == "" ? 0 : Convert.ToInt32(args));
+                    // make it less complicated
+                    return Globals._commands.Del(0, Source);
+                // case "save":
+                //     return Globals._commands.Save(args);
+                //     break;
                 case "undo":
-                    Globals._commands.Undo();
-                    break;
+                    return Globals._commands.Undo(Source);
                 case "help":
-                    Globals._commands.Help(args);
-                    break;
+                    return Globals._commands.Help(args);
                 case "count":
-                    Globals._commands.Count(args);
-                    break;
-                case "check":
-                    Globals._commands.Check(args);
-                    break;
+                    return Globals._commands.Count(Source);
+                // case "check":
+                //     return Globals._commands.Check(args);
+                //     break;
                 case "reload":
-                    Globals._commands.ReloadBooklist(args);
-                    break;
+                    return Globals._commands.ReloadBooklist(args);
                 case "config":
-                    Globals._commands.Config(args);
-                    break;
-                case "quit":
-                    Globals._commands.Quit();
-                    break;
+                    return Globals._commands.Config(args);
+                // case "quit":
+                //     return Globals._commands.Quit();
+                //     break;
                 case "version":
-                    Globals._commands.Version();
-                    break;
-                case "exist":
-                    Globals._commands.Exist(args);
-                    break;
+                    return Globals._commands.Version();
+                // case "exist":
+                //     return Globals._commands.Exist(args);
+                //     break;
                 case "search":
-                    Globals._commands.Search(args);
-                    break;
+                    return Globals._commands.Search(args);
+                case "next":
+                    return Globals._commands.Next(Source);
+                case "shelf":
+                    return Globals._commands.Shelf(args);
+                case "skip":
+                    return Globals._commands.Skip(Source);
                 default:
-                    Console.WriteLine("Invalid command.");
-                    break;
+                    return "Invalid Command";
             }
         }
         else
         {
-            Globals._commands.ReadInput(Globals._format.GetFormat(Input));
+            // TODO: Make formatting better, right now disable it first
+            return Globals._commands.ReadInput(Globals._format[Source].GetFormat(Input), Source);
+            // return Globals._commands.ReadInput(Input, Source);
         }
     }
 }
