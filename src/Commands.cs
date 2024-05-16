@@ -31,7 +31,7 @@ public class Commands
             {
                 ChannelStatus["Current"].Add(channel.Id);
             } 
-            else if (channel.Category.Id == Globals._archivedShelvesGroupId)
+            else if (Globals._archivedShelvesGroupId.Contains(channel.Category.Id))
             {
                 ChannelStatus["Archived"].Add(channel.Id);
             }
@@ -840,10 +840,24 @@ public class Commands
         }
         else
         {
+            int Index = -1;
+            for (int i = 0; i < Globals._archivedShelvesGroupId.Count(); i++)
+            {
+                ulong Id = Globals._archivedShelvesGroupId[i];
+                if (_client.GetGuild(Globals._guildId).GetCategoryChannel(Id).Channels.Count == 50)
+                {
+                    continue;
+                }
+                else
+                {
+                    Index = i;
+                    break;
+                }
+            }
             // Discord procedures
             await Channel.ModifyAsync(x =>
             {
-                x.CategoryId = Globals._archivedShelvesGroupId;
+                x.CategoryId = Globals._archivedShelvesGroupId[Index];
             });
             Serilog.Log.Information($"Successfully archive a channel with name {Channel.Name}.");
 
@@ -852,7 +866,7 @@ public class Commands
             Globals._normalUndoStack.Remove(ChannelId);
             Globals._buffer.Remove(ChannelId);
             Globals._doubleChecked.Remove(ChannelId);
-            Globals._shelfName.Remove(ChannelId);
+            // Globals._shelfName.Remove(ChannelId);
             Globals._inputBuffer.Remove(ChannelId);
             Serilog.Log.Information($"Successfully remove environment for bookshelf {ChannelId}.");
 
