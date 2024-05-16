@@ -24,7 +24,7 @@ public static class Globals
     public static Stocker _stocker = new Stocker();
 
     public static ulong _currentShelvesGroupId = 1126023880927092766;
-    public static ulong _archivedShelvesGroupId = 1126023908542386217;
+    public static ulong[] _archivedShelvesGroupId = {1126023908542386217, 1128225475798499328};
     public static ulong _guildId = 1126023351069065248;
     public static ulong _generalChannelId = 1126023351811448884;
 }
