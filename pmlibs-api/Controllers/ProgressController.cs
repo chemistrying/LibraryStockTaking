@@ -27,6 +27,10 @@ public class ProgressController : ControllerBase
         {
             return NotFound();
         }
+        else if (!session.IsActive)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, "The session is currently inactive");
+        }
 
         List<Bookshelf> bookshelves = await _bookshelvesService.GetSessionBookshelvesAsync(sessionId);
         
@@ -42,6 +46,10 @@ public class ProgressController : ControllerBase
         if (session is null)
         {
             return NotFound();
+        }
+        else if (!session.IsActive)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, "The session is currently inactive");
         }
         else if (session.AllBookshelfGroups.Find(x => x.GroupName == groupName) is null)
         {
