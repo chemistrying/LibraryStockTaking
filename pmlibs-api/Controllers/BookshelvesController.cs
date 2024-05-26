@@ -61,6 +61,29 @@ public class BookshelvesController : ControllerBase
         return bookshelf;
     }
 
+    [HttpGet("{sessionId:length(24)}/{groupName}")]
+    public async Task<ActionResult<List<Bookshelf>>> GetByGroup(string sessionId, string groupName) {
+        var session = await _sessionsService.GetAsync(sessionId);
+
+        // check if the session exists and the session is active or not
+        if (session is null)
+        {
+            return NotFound();
+        }
+        else if (!session.IsActive)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, "The session is currently inactive");
+        }
+        else if (session.AllBookshelfGroups.Find(x => x.GroupName == groupName) is null)
+        {
+            return NotFound();
+        }
+
+
+        var bookshelves = await _bookshelvesService.GetGroupBookshelvesAsync(sessionId, groupName);
+        return bookshelves;
+    }
+
     [HttpPost]
     public async Task<IActionResult> Post(string sessionId, string groupName)
     {
