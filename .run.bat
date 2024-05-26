@@ -1,3 +1,0 @@
-@echo off
-echo Start running the program...
-libraryStockTaking.exe
