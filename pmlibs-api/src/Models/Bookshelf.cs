@@ -51,7 +51,7 @@ public class Bookshelf
     public int Status { get; set; }
 
     /// <summary>
-    /// Storing the barcodes of the books in this shelf
+    /// Storing the barcodes (in terms of BookInput) of the books in this shelf
     /// </summary>
-    public List<string> AllBooks { get; set; } = null!;
+    public List<BookInput> AllBooks { get; set; } = null!;
 }
