@@ -19,38 +19,43 @@ public class Book
     public string Language { get; set; } = null!;
     public string Category { get; set; } = null!;
 
-    public Book(string[] Blocks)
+    public Book(string[] blocks)
     {
         for (int i = 0; i < 13; i++)
         {
+            if (blocks[i] == "")
+            {
+                blocks[i] = "(empty)";
+            }            
+            
             switch (i)
             {
                 case 0:
-                    Acno = Blocks[i];
+                    Acno = blocks[i];
                     break;
                 case 2:
-                    Callno1 = Blocks[i];
+                    Callno1 = blocks[i];
                     break;
                 case 4:
-                    Callno2 = Blocks[i];
+                    Callno2 = blocks[i];
                     break;
                 case 5:
-                    Name = Blocks[i];
+                    Name = blocks[i];
                     break;
                 case 6:
-                    Status = Blocks[i];
+                    Status = blocks[i];
                     break;
                 case 7:
-                    Publisher = Blocks[i];
+                    Publisher = blocks[i];
                     break;
                 case 8:
-                    Author = Blocks[i];
+                    Author = blocks[i];
                     break;
                 case 11:
-                    Language = Blocks[i];
+                    Language = blocks[i];
                     break;
                 case 12:
-                    Category = Blocks[i];
+                    Category = blocks[i];
                     break;
                 default:
                     break;
