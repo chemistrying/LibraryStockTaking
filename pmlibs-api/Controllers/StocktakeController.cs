@@ -104,10 +104,15 @@ public class StocktakeController : ControllerBase
         switch (operation)
         {
             case "add":
-                var prevBook = bookshelf.AllBooks.Count == 0 ? null : await _booksService.GetAsync(bookshelf.AllBooks.Last());
+                var prevBook = bookshelf.AllBooks.Count == 0 ? null : await _booksService.GetAsync(bookshelf.AllBooks.Last().Barcode);
                 
+                BookInput newBookInput = new()
+                {
+                    Barcode = barcode,
+                    InputTime = DateTime.Now
+                };
+
                 // TODO: Prehandle the barcode
-                bookshelf.AllBooks.Add(barcode);
                 bookshelf.Status = StocktakeStatusCode.InProgress;
 
                 // check barcode validity
@@ -136,18 +141,22 @@ public class StocktakeController : ControllerBase
                 {
                     stocktakeResponse.BookInformation = book.ToStandardFormat();
                 }
+
+                newBookInput.ReturnedResponse = stocktakeResponse;
                 
+                bookshelf.AllBooks.Add(newBookInput);
                 break;
             case "delete":
-                var isSuccessful = bookshelf.AllBooks.Remove(barcode);
-                if (!isSuccessful)
+                var targetIndex = bookshelf.AllBooks.FindIndex(x => x.Barcode == barcode);
+                if (targetIndex == -1)
                 {
                     stocktakeResponse.Verdict = StocktakeVerdict.Error;
-                    stocktakeResponse.Message = $"Barcode {stocktakePayload.Barcode} cannot found in the bookshelf.";
+                    stocktakeResponse.Message = $"Barcode {barcode} cannot found in the bookshelf.";
                 }
                 else
                 {
-                    stocktakeResponse.Message = $"Barcode {stocktakePayload.Barcode} has been deleted successfully.";
+                    bookshelf.AllBooks.RemoveAt(targetIndex);
+                    stocktakeResponse.Message = $"Barcode {barcode} has been deleted successfully.";
                 }
                 break;
             case "start":
