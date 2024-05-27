@@ -115,24 +115,24 @@ public class SessionsController : ControllerBase
         return Ok();
     }
 
-    [HttpDelete("{id:length(24)}")]
-    public async Task<IActionResult> Delete(string id)
-    {
-        var session = await _sessionsService.GetAsync(id);
+    // [HttpDelete("{id:length(24)}")]
+    // public async Task<IActionResult> Delete(string id)
+    // {
+    //     var session = await _sessionsService.GetAsync(id);
 
-        if (session is null)
-        {
-            return NotFound();
-        }
+    //     if (session is null)
+    //     {
+    //         return NotFound();
+    //     }
 
-        // remove bookshelves as well
-        foreach (BookshelfGroup bookshelfGroup in session.AllBookshelfGroups)
-        {
-            await _bookshelvesService.RemoveManyAsync(bookshelfGroup.GroupName);
-        }
+    //     // remove bookshelves as well
+    //     foreach (BookshelfGroup bookshelfGroup in session.AllBookshelfGroups)
+    //     {
+    //         await _bookshelvesService.RemoveManyAsync(bookshelfGroup.GroupName);
+    //     }
 
-        await _sessionsService.RemoveAsync(id);
+    //     await _sessionsService.RemoveAsync(id);
 
-        return NoContent();
-    }
+    //     return NoContent();
+    // }
 }
