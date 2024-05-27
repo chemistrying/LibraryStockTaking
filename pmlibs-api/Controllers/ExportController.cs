@@ -61,6 +61,6 @@ public class ExportController : ControllerBase
             }
         }
 
-        return File(await System.IO.File.ReadAllBytesAsync(newExportName), "application/zip");
+        return File(await System.IO.File.ReadAllBytesAsync(newExportName), "application/zip", $"export_{dto.ToUnixTimeSeconds()}.zip");
     }
 }
