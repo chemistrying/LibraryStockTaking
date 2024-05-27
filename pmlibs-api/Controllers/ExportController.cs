@@ -28,6 +28,16 @@ public class ExportController : ControllerBase
             return NotFound();
         }
 
+        // clean all files to prevent cluttering
+        DirectoryInfo di = new("exports/");
+        if (di.GetFiles().Length >= 100) {
+            foreach (FileInfo file in di.GetFiles())
+            {
+                file.Delete(); 
+            }
+        } 
+
+        // create new zip
         DateTimeOffset dto = new(DateTime.Now);
         string newExportName = $"exports/export_{dto.ToUnixTimeSeconds()}.zip";
 
