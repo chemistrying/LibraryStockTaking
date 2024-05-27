@@ -35,6 +35,7 @@ public class ActiveController : ControllerBase
         }
         else if (session.IsActive)
         {
+            // chosen session already active, quit
             return Ok();
         }
 
