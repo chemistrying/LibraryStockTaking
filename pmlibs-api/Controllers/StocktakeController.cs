@@ -158,6 +158,8 @@ public class StocktakeController : ControllerBase
                     bookshelf.AllBooks.RemoveAt(targetIndex);
                     stocktakeResponse.Message = $"Barcode {barcode} has been deleted successfully.";
                 }
+
+                bookshelf.Status = StocktakeStatusCode.InProgress;
                 break;
             case "start":
                 bookshelf.Status = StocktakeStatusCode.InProgress;
