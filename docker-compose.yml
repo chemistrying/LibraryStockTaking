@@ -1,0 +1,40 @@
+version: '3.9'
+services:
+  mongodb:
+    image: mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=user
+      - MONGO_INITDB_ROOT_PASSWORD=pass
+    volumes:
+      - type: bind
+        source: ./data
+        target: /data/db
+    ports:
+      - '27017:27017'
+  api:
+    build:
+      context: ./pmlibs-api
+      dockerfile: ./pmlibs-api/Dockerfile
+      args:
+        DOMAIN: ${DOMAIN}
+    container_name: api_container
+    depends_on:
+      - mongodb
+    ports:
+      - '5052:5052'
+  cors:
+    build:
+      context: ./cors
+      dockerfile: ./cors/Dockerfile
+    container_name: cors_container
+    ports:
+      - '8080:8080'
+  app:
+    build:
+      context: ./pmlibs-vue
+      dockerfile: ./pmlibs-vue/Dockerfile
+    container_name: vue_app_container
+    ports:
+      - '80:80'
+      
+    
