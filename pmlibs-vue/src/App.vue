@@ -20,7 +20,7 @@ export default {
         return {
             activePage: 0, // 0 = root, 1 = whole session, 2 = bookshelf group, 3 = bookshelf
             // apiUrl: "http://camistryin.ddns.net:8080/http://camistryin.ddns.net:5052/",
-            apiUrl: "http://192.168.0.189:8080/http://192.168.0.189:5052/",
+            apiUrl: "",
             sessionId: null,
             bookshelfGroup: null,
             bookshelfId: null,
@@ -83,9 +83,14 @@ export default {
         }
     },
     mounted() {
+        const domain = window.location.host.split(":")[0];
+        this.apiUrl = `http://${domain}:8080/http://${domain}:5052`;
+
         this.$nextTick(() => {
-        window.addEventListener('resize', this.onResize);
+            window.addEventListener('resize', this.onResize);
         })
+
+        console.log(this.apiUrl);
     }
 }
 </script>
