@@ -91,10 +91,54 @@ public class StocktakeController : ControllerBase
         return Ok("");
     }
 
+    private string Zeroify(string barcode)
+    {
+        bool ok = false;
+        // check if the Barcode is all numbers
+        for (int i = 0; i < barcode.Length; i++)
+        {
+            ok &= Char.IsDigit(barcode[i]);
+        }
+
+        if (ok)
+        {
+            // Console.WriteLine(Barcode);
+            string prefix = new('0', Math.Max(0, 5 - barcode.Length));
+            barcode = prefix + barcode;
+        }
+
+        return barcode;
+    }
+
+    private string PrehandleBarcode(string barcode)
+    {
+        if (Globals.Config.AutoCapitalize)
+        {
+            barcode = barcode.ToUpper();
+        }
+
+        if (Globals.Config.AutoZero)
+        {
+            // Console.WriteLine("OK");
+            if (barcode.Length < 5)
+            {
+                barcode = Zeroify(barcode);
+            }
+            else if (barcode.First() == 'C' && barcode.Length < 6)
+            {
+                // Console.WriteLine(Barcode);
+                barcode = 'C' + Zeroify(barcode[1..]);
+                // File.AppendAllText("files\\zeros.txt", Barcode + '\n');
+            }
+        }
+
+        return barcode;
+    }
+
     private async Task<ActionResult<StocktakeResponse>> PerformAction(StocktakePayload stocktakePayload, Bookshelf bookshelf)
     {
         var operation = stocktakePayload.Operation!;
-        var barcode = stocktakePayload.Barcode!;
+        var barcode = stocktakePayload.Barcode;
         StocktakeResponse stocktakeResponse = new()
         {
             Verdict = StocktakeVerdict.Ok,
@@ -104,6 +148,8 @@ public class StocktakeController : ControllerBase
         switch (operation)
         {
             case "add":
+                barcode = PrehandleBarcode(barcode!);
+
                 var prevBook = bookshelf.AllBooks.Count == 0 ? null : await _booksService.GetAsync(bookshelf.AllBooks.Last().Barcode);
                 
                 BookInput newBookInput = new()
@@ -132,6 +178,30 @@ public class StocktakeController : ControllerBase
                     stocktakeResponse.Verdict = StocktakeVerdict.Warning;
                     stocktakeResponse.Message = $"Book '{barcode}' has a different category comparing to the previous book (current: {book.Callno1}, previous: {prevBook.Callno1}), might be a sign of wrong barcode?";
                 }
+                else if (bookshelf.AllBooks.Find(x => x.Barcode == barcode) is not null)
+                {
+                    stocktakeResponse.Verdict = StocktakeVerdict.Warning;
+                    stocktakeResponse.Message = "You have already stock-taken this book. Please remove it to prevent duplicates.";
+                }
+                else if (Globals.DuplicationList.Query(barcode) >= 1)
+                {
+                    // obtain all bookshelves from that session
+                    List<Bookshelf> allBookshelves = await _bookshelvesService.GetSessionBookshelvesAsync(bookshelf.SessionId);
+
+                    var other = allBookshelves.Find(x => x.AllBooks.Find(y => y.Barcode == barcode) != null);
+
+                    if (other is null)
+                    {
+                        Serilog.Log.Fatal("Trie does not match database.");
+                        stocktakeResponse.Verdict = StocktakeVerdict.Error;
+                        stocktakeResponse.Message = "The system has encountered an abnormal bug. Please report this issue to administrator / Github repo.";
+                    }
+                    else
+                    {
+                        stocktakeResponse.Verdict = StocktakeVerdict.Warning;
+                        stocktakeResponse.Message = $"Book '{barcode} has been stock-taken in other bookshelves (aka {other.GroupName}-{other.ShelfNumber}), are you sure you have entered the correct barcode?";
+                    }
+                }
                 else
                 {
                     stocktakeResponse.Message = $"Book '{barcode}' has been successfully added.";
@@ -140,6 +210,9 @@ public class StocktakeController : ControllerBase
                 if (book is not null)
                 {
                     stocktakeResponse.BookInformation = book.ToStandardFormat();
+
+                    // add to duplication list
+                    Globals.DuplicationList.Insert(barcode);
                 }
 
                 newBookInput.ReturnedResponse = stocktakeResponse;
@@ -147,7 +220,9 @@ public class StocktakeController : ControllerBase
                 bookshelf.AllBooks.Add(newBookInput);
                 break;
             case "delete":
-                var targetIndex = bookshelf.AllBooks.FindIndex(x => x.Barcode == barcode);
+                barcode = PrehandleBarcode(barcode!);
+
+                var targetIndex = bookshelf.AllBooks.FindLastIndex(x => x.Barcode == barcode);
                 if (targetIndex == -1)
                 {
                     stocktakeResponse.Verdict = StocktakeVerdict.Error;
@@ -156,6 +231,10 @@ public class StocktakeController : ControllerBase
                 else
                 {
                     bookshelf.AllBooks.RemoveAt(targetIndex);
+
+                    // remove from duplication list
+                    Globals.DuplicationList.Delete(barcode);
+
                     stocktakeResponse.Message = $"Barcode {barcode} has been deleted successfully.";
                 }
 
