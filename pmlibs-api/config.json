@@ -1,7 +1,7 @@
 {
     "DefaultSaveLocation": "exports",
     "DefaultProgramFilesLocation": "files",
-    "LoggingLevel": "Debug",
+    "LoggingLevel": "Information",
     "Version": "4.0.0",
     "AutoCapitalize": true,
     "AutoZero": true,
