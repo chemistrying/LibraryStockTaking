@@ -1,13 +1,9 @@
 {
-    "DefaultBooklistLocation": "booklist",
-    "DefaultSaveLocation": "foo",
-    "DefaultProgramFilesLocation": "files\\",
+    "DefaultSaveLocation": "exports",
+    "DefaultProgramFilesLocation": "files",
     "LoggingLevel": "Debug",
-    "Version": "0.0.0",
-    "ShowAllBooksPosition": false,
-    "Autocheck": true,
+    "Version": "4.0.0",
     "AutoCapitalize": true,
     "AutoZero": true,
-    "DetailedBooklist": true,
     "BookshelfTreeProfile": 0
 }
