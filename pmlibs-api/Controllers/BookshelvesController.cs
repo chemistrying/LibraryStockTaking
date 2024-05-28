@@ -114,7 +114,7 @@ public class BookshelvesController : ControllerBase
         return CreatedAtAction(nameof(Get), new { sessionId = sessionId, bookshelfId = newBookshelf.Id }, newBookshelf);
     }
 
-    [HttpPut("{sessionId:length(24)}/{bookshelfId:length(24)}/{description}")]
+    [HttpPut("{sessionId:length(24)}/{bookshelfId:length(24)}")]
     public async Task<IActionResult> Update(string sessionId, string bookshelfId, string description)
     {
         var session = await _sessionsService.GetAsync(sessionId);
