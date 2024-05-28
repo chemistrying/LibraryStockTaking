@@ -29,7 +29,7 @@ public class ExportController : ControllerBase
         }
 
         // clean all files to prevent cluttering
-        DirectoryInfo di = new("exports/");
+        DirectoryInfo di = new($"{Globals.Config.DefaultSaveLocation}/");
         if (di.GetFiles().Length >= 100) {
             foreach (FileInfo file in di.GetFiles())
             {
@@ -39,9 +39,10 @@ public class ExportController : ControllerBase
 
         // create new zip
         DateTimeOffset dto = new(DateTime.Now);
-        string newExportName = $"exports/export_{dto.ToUnixTimeSeconds()}.zip";
+        string newExportName = $"export_{dto.ToUnixTimeSeconds()}.zip";
+        string newExportFilePath = Path.Combine(Globals.Config.DefaultSaveLocation, newExportName);
 
-        using (FileStream newZipStream = new(newExportName, FileMode.OpenOrCreate))
+        using (FileStream newZipStream = new(newExportFilePath, FileMode.OpenOrCreate))
         {
             using (ZipArchive archive = new(newZipStream, ZipArchiveMode.Update))
             {
@@ -58,7 +59,8 @@ public class ExportController : ControllerBase
                     foreach (Bookshelf bookshelf in bookshelves)
                     {
                         // create entry
-                        ZipArchiveEntry newBookshelfEntry = archive.CreateEntry($"{bookshelfGroupName}/{bookshelfGroupName}-{bookshelf.ShelfNumber}.txt");
+                        string newFilePath = Path.Combine(bookshelfGroupName, $"{bookshelfGroupName}-{bookshelf.ShelfNumber}.txt");
+                        ZipArchiveEntry newBookshelfEntry = archive.CreateEntry(newFilePath);
                         using (StreamWriter writer = new(newBookshelfEntry.Open()))
                         {
                             foreach (BookInput bookInput in bookshelf.AllBooks)
@@ -71,6 +73,6 @@ public class ExportController : ControllerBase
             }
         }
 
-        return File(await System.IO.File.ReadAllBytesAsync(newExportName), "application/zip", $"export_{dto.ToUnixTimeSeconds()}.zip");
+        return File(await System.IO.File.ReadAllBytesAsync(newExportFilePath), "application/zip", newExportName);
     }
 }

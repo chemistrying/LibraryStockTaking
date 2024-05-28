@@ -26,7 +26,7 @@ public class ReloadController : ControllerBase
         // reload booklist
         await _booksService.RemoveAllAsync();
         List<Book> newBooklist = [];
-        using (StreamReader sr = new StreamReader("files\\booklist.txt")!)
+        using (StreamReader sr = new(Path.Combine(Globals.Config.DefaultProgramFilesLocation, "booklist.txt")))
         {
             sr.ReadLine();
             while (!sr.EndOfStream)

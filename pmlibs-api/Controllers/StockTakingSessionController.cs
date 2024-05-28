@@ -41,7 +41,7 @@ public class SessionsController : ControllerBase
     {
         var pregenBookshelfGroups = new List<BookshelfGroup>();
 
-        var bookshelfTreeProfile = JsonConvert.DeserializeObject<Dictionary<string, int>>(System.IO.File.ReadAllText($"files\\profile_v{Globals.Config.BookshelfTreeProfile}.json"))!;
+        var bookshelfTreeProfile = JsonConvert.DeserializeObject<Dictionary<string, int>>(System.IO.File.ReadAllText(Path.Combine(Globals.Config.DefaultProgramFilesLocation, $"profile_v{Globals.Config.BookshelfTreeProfile}.json")))!;
             
         // create a blank session first
         StockTakingSession newSession = new();
