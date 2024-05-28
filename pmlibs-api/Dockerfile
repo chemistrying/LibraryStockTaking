@@ -9,11 +9,11 @@ RUN dotnet restore -a $TARGETARCH
 # copy everything else and build app
 COPY . .
 RUN dotnet publish -a $TARGETARCH -c release -o /app --no-restore
+COPY ./files /app
 
 # final stage/image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine
 EXPOSE 5052
 WORKDIR /app
 COPY --from=build /app ./
-COPY --from=build ./files ./
 ENTRYPOINT ["./pmlibs"]
