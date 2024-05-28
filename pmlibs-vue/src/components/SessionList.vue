@@ -18,7 +18,7 @@ export default {
     },
     computed: {
         async fetchAllSessions() {
-            this.$root.allSessionsInfo = await fetch(`${this.$root.apiUrl}api/sessions`).then(response => response.json());
+            this.$root.allSessionsInfo = await fetch(`${this.$root.apiUrl}/api/sessions`).then(response => response.json());
         }
     },
     data() {
@@ -28,7 +28,7 @@ export default {
         }
     },
     async mounted() {
-        this.$root.allSessionsInfo = await fetch(`${this.$root.apiUrl}api/sessions`).then(response => response.json());
+        this.$root.allSessionsInfo = await fetch(`${this.$root.apiUrl}/api/sessions`).then(response => response.json());
         
         // user page
         this.$root.allSessionsInfo = this.$root.allSessionsInfo.filter(session => session.isActive);
