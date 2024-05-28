@@ -13,7 +13,7 @@ services:
   api:
     build:
       context: ./pmlibs-api
-      dockerfile: ./pmlibs-api/Dockerfile
+      dockerfile: Dockerfile
       args:
         DOMAIN: ${DOMAIN}
     container_name: api_container
@@ -24,14 +24,14 @@ services:
   cors:
     build:
       context: ./cors
-      dockerfile: ./cors/Dockerfile
+      dockerfile: Dockerfile
     container_name: cors_container
     ports:
       - '8080:8080'
   app:
     build:
       context: ./pmlibs-vue
-      dockerfile: ./pmlibs-vue/Dockerfile
+      dockerfile: Dockerfile
     container_name: vue_app_container
     ports:
       - '80:80'
