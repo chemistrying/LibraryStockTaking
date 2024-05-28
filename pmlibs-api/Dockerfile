@@ -15,4 +15,5 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine
 EXPOSE 5052
 WORKDIR /app
 COPY --from=build /app ./
-ENTRYPOINT ["./aspnetapp"]
+COPY --from=build ./files ./
+ENTRYPOINT ["./pmlibs"]
