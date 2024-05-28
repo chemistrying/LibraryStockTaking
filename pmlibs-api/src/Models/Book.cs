@@ -10,13 +10,21 @@ public class Book
     public string? Id { get; set; }
 
     public string Acno { get; set; } = null!;
+
     public string Callno1 { get; set; } = null!;
+
     public string Callno2 { get; set; } = null!;
+
     public string Name { get; set; } = null!;
+
     public string Status { get; set; } = null!;
+
     public string Publisher { get; set; } = null!;
+
     public string Author { get; set; } = null!;
+
     public string Language { get; set; } = null!;
+    
     public string Category { get; set; } = null!;
 
     public Book(string[] blocks)

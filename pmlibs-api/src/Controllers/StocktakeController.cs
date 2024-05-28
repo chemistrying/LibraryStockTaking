@@ -2,8 +2,6 @@ using LibrarySystemApi.Models;
 using LibrarySystemApi.Services;
 using Microsoft.AspNetCore.Mvc;
 
-using Newtonsoft.Json;
-
 namespace LibrarySystemApi.Controllers;
 
 [ApiController]

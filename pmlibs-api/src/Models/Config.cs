@@ -3,12 +3,19 @@ namespace LibrarySystemApi.Models;
 public class Config
 {
     public string DefaultSaveLocation;
+
     public string DefaultProgramFilesLocation;
+
     public string LoggingLevel;
+
     public string Version;
+
     public bool AutoCapitalize;
+
     public bool AutoZero;
+
     public int BookshelfTreeProfile;
+    
     public string[] Options =
     [
         "DefaultSaveLocation",
