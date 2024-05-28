@@ -10,10 +10,14 @@ namespace LibrarySystemApi.Controllers;
 [Route("api/[controller]")]
 public class ReloadController : ControllerBase
 {
+    private readonly SessionsService _sessionsService;
+    private readonly BookshelvesService _bookshelvesService;
     private readonly BooksService _booksService;
 
-    public ReloadController(BooksService booksService)
+    public ReloadController(SessionsService sessionsService, BookshelvesService bookshelvesService, BooksService booksService)
     {
+        _sessionsService = sessionsService;
+        _bookshelvesService = bookshelvesService;
         _booksService = booksService;
     }
 
@@ -38,6 +42,27 @@ public class ReloadController : ControllerBase
         }
 
         await _booksService.CreateAsync(newBooklist);
+
+        // update duplication list
+        Globals.DuplicationList = new Trie();
+
+        var session = await _sessionsService.GetActiveAsync();
+
+        if (session is not null)
+        {
+            List<Bookshelf> bookshelves = await _bookshelvesService.GetSessionBookshelvesAsync(session.Id!);
+            foreach (var bookshelf in bookshelves)
+            {
+                foreach (var bookInput in bookshelf.AllBooks)
+                {
+                    // do not insert erroneous barcode
+                    if (bookInput.ReturnedResponse.Verdict != StocktakeVerdict.Error)
+                    {
+                        Globals.DuplicationList.Insert(bookInput.Barcode);
+                    }
+                }
+            }
+        }
         
         return Ok();
     }
