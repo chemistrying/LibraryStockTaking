@@ -2,6 +2,8 @@
 ARG DOMAIN
 FROM node:lts-alpine
 
+WORKDIR /proxy
+
 ARG DOMAIN
 ENV NODE_ENV=production
 ENV NODE_PATH=/usr/local/lib/node_modules
