@@ -18,7 +18,7 @@ services:
     depends_on:
       - mongodb
     ports:
-      - '5052:5052'
+      - '5000:5000'
   cors:
     build:
       context: ./cors

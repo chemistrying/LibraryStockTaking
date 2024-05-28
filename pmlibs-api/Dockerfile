@@ -13,7 +13,8 @@ COPY ./files /app
 
 # final stage/image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine
-EXPOSE 5052
+ENV ASPNETCORE_HTTP_PORTS=5000
+EXPOSE 5000
 WORKDIR /app
 COPY --from=build /app ./
 ENTRYPOINT ["./pmlibs"]
