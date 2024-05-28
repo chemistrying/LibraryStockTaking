@@ -1,4 +1,3 @@
-using LibrarySystemApi.Models;
 using Newtonsoft.Json;
 
 namespace LibrarySystemApi.Models;
