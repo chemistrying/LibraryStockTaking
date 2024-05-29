@@ -58,7 +58,8 @@ export default {
                     pageTitle: 'Bookshelf Page',
                     content: 'This is the bookshelf content'
                 }
-            ]
+            ],
+            version: process.env.VUE_APP_VERSION
         };
     },
     methods: {
@@ -87,6 +88,8 @@ export default {
         })
 
         console.log(this.apiUrl);
+
+        console.log(`Copyright chemistrying 2024. Version ${this.version}.`)
     }
 }
 </script>

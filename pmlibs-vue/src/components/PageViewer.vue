@@ -22,7 +22,7 @@
         </Transition>
     </div>
     <div class="container w-100 mb-3 mt-3 text-center text-secondary">
-        Made by chemistrying
+        © chemistrying, 2024. Version {{ this.$root.version }}.
         <div class="container">
             <a href="https://github.com/chemistrying/libraryStockTaking">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-github github-svg" viewBox="0 0 16 16">
