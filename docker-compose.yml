@@ -14,6 +14,9 @@ services:
       dockerfile: Dockerfile
       args:
         DOMAIN: ${DOMAIN}
+    environment:
+      - CONNECTION_STRING=mongodb://user:pass@mongodb:27017/
+      - CONNECTION_DATABASE=library
     container_name: api_container
     depends_on:
       - mongodb

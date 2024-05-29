@@ -1,5 +1,4 @@
 using LibrarySystemApi.Models;
-using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
 namespace LibrarySystemApi.Services;
@@ -8,17 +7,16 @@ public class BookshelvesService
 {
     private readonly IMongoCollection<Bookshelf> _bookshelvesCollection;
 
-    public BookshelvesService(
-        IOptions<BookshelvesDatabaseSettings> bookshelvesDatabaseSettings)
+    public BookshelvesService(string collectionName)
     {
         var client = new MongoClient(
-            bookshelvesDatabaseSettings.Value.ConnectionString);
+            LibraryDatabaseSettings.ConnectionString);
 
         var database = client.GetDatabase(
-            bookshelvesDatabaseSettings.Value.DatabaseName);
+            LibraryDatabaseSettings.DatabaseName);
 
         _bookshelvesCollection = database.GetCollection<Bookshelf>(
-            bookshelvesDatabaseSettings.Value.BookshelvesCollectionName);
+            collectionName);
     }
 
     public async Task<List<Bookshelf>> GetAsync() =>

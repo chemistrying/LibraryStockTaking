@@ -1,5 +1,4 @@
 using LibrarySystemApi.Models;
-using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
 namespace LibrarySystemApi.Services;
@@ -8,17 +7,16 @@ public class BooksService
 {
     private readonly IMongoCollection<Book> _booksCollection;
 
-    public BooksService(
-        IOptions<BooksDatabaseSettings> booksDatabaseSettings)
+    public BooksService(string collectionName)
     {
         var client = new MongoClient(
-            booksDatabaseSettings.Value.ConnectionString);
+            LibraryDatabaseSettings.ConnectionString);
 
         var database = client.GetDatabase(
-            booksDatabaseSettings.Value.DatabaseName);
+            LibraryDatabaseSettings.DatabaseName);
 
         _booksCollection = database.GetCollection<Book>(
-            booksDatabaseSettings.Value.BooksCollectionName);
+            collectionName);
 
         // initialize the books database
         _booksCollection.DeleteMany(_ => true);

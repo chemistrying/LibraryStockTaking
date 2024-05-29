@@ -1,5 +1,4 @@
 using LibrarySystemApi.Models;
-using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
 namespace LibrarySystemApi.Services;
@@ -8,19 +7,18 @@ public class SessionsService
 {
     private readonly IMongoCollection<StockTakingSession> _sessionsCollection;
 
-    public SessionsService(
-        IOptions<SessionsDatabaseSettings> sessionsDatabaseSettings)
+    public SessionsService(string collectionName)
     {
 
         var client = new MongoClient(
-            sessionsDatabaseSettings.Value.ConnectionString);
+            LibraryDatabaseSettings.ConnectionString);
         // Serilog.Log.Information("HI" + sessionsDatabaseSettings.Value.SessionsCollectionName);
 
         var database = client.GetDatabase(
-            sessionsDatabaseSettings.Value.DatabaseName);
+            LibraryDatabaseSettings.DatabaseName);
 
         _sessionsCollection = database.GetCollection<StockTakingSession>(
-            sessionsDatabaseSettings.Value.SessionsCollectionName);
+            collectionName);
     }
 
     public async Task<List<StockTakingSession>> GetAsync() =>
