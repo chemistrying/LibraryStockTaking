@@ -137,6 +137,7 @@ public class StocktakeController : ControllerBase
     {
         var operation = stocktakePayload.Operation!;
         var barcode = stocktakePayload.Barcode;
+        Book? book;
         StocktakeResponse stocktakeResponse = new()
         {
             Verdict = StocktakeVerdict.Ok,
@@ -160,7 +161,7 @@ public class StocktakeController : ControllerBase
                 bookshelf.Status = StocktakeStatusCode.InProgress;
 
                 // check barcode validity
-                var book = await _booksService.GetAsync(barcode);
+                book = await _booksService.GetAsync(barcode);
                 if (book is null)
                 {
                     stocktakeResponse.Verdict = StocktakeVerdict.Error;
@@ -230,8 +231,12 @@ public class StocktakeController : ControllerBase
                 {
                     bookshelf.AllBooks.RemoveAt(targetIndex);
 
-                    // remove from duplication list
-                    Globals.DuplicationList.Delete(barcode);
+                    // remove from duplication list if and only if the barcode is valid
+                    book = await _booksService.GetAsync(barcode);
+                    if (book is not null)
+                    {
+                        Globals.DuplicationList.Delete(barcode);
+                    }
 
                     stocktakeResponse.Message = $"Barcode {barcode} has been deleted successfully.";
                 }
