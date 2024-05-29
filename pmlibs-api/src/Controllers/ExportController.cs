@@ -28,6 +28,12 @@ public class ExportController : ControllerBase
             return NotFound();
         }
 
+        // if the directory doesn't exist, create it
+        if (!Directory.Exists("exports"))
+        {
+            Directory.CreateDirectory("exports");
+        }
+
         // clean all files to prevent cluttering
         DirectoryInfo di = new($"{Globals.Config.DefaultSaveLocation}/");
         if (di.GetFiles().Length >= 100) {
