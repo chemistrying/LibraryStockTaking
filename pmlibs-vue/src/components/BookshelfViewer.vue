@@ -6,7 +6,7 @@
                     <h4 class="card-title"> {{ session.sessionName }} </h4>
                     <p class="card-subtitle text-body-secondary"> #{{ session.id }} </p>
                     <p class="card-subtitle text-body-secondary mt-1"> {{ session.description }} </p>
-                    <p class="card-text text-body-secondary"> Start Time: {{ session.startDate }} </p>
+                    <p class="card-text text-body-secondary"> Start Time: {{ this.$root.readableTime(session.startDate) }} </p>
                     <p class="card-text"> Total Progress: </p>
                     <div class="progress" role="progressbar" aria-label="Basic example 20px high" :aira-valuenow=progress aria-valuemin="0" aria-valuemax="100">
                         <div class="progress-bar" role="progressbar" :style="`width: ${progress}%`"></div>
@@ -24,7 +24,7 @@
                     <h4 class="card-title"> {{ bookshelf.groupName + '-' + bookshelf.shelfNumber }} </h4>
                     <p class="card-subtitle text-body-secondary"> #{{ bookshelf.id }} </p>
                     <p class="card-subtitle text-body-secondary mt-1"> {{ bookshelf.description }} </p>
-                    <p class="card-text text-body-secondary" v-if="bookshelf.status !== 0"> Start Time: {{ bookshelf.startTime }} </p>
+                    <p class="card-text text-body-secondary" v-if="bookshelf.status !== 0"> Start Time: {{ this.$root.readableTime(bookshelf.startTime) }} </p>
                     <button type="submit" class="btn btn-success" @click.prevent="startStocktake" v-if="bookshelf.status === 0">
                         Start
                     </button>
