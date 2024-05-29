@@ -1,6 +1,7 @@
 using LibrarySystemApi.Models;
 using LibrarySystemApi.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.RegularExpressions;
 
 namespace LibrarySystemApi.Controllers;
 
@@ -12,6 +13,7 @@ public class StocktakeController : ControllerBase
     private readonly BookshelvesService _bookshelvesService;
     private readonly BooksService _booksService;
     private readonly List<string> _possibleOperations = ["add", "delete", "start", "finish"];
+    private readonly Regex _trimmedBarcodeRegexPattern = new(@"^(C?)(\d{1,4})$");
 
     public StocktakeController(SessionsService sessionsService, BookshelvesService booksehlvesService, BooksService booksService)
     {
@@ -89,25 +91,6 @@ public class StocktakeController : ControllerBase
         return Ok("");
     }
 
-    private string Zeroify(string barcode)
-    {
-        bool ok = false;
-        // check if the Barcode is all numbers
-        for (int i = 0; i < barcode.Length; i++)
-        {
-            ok &= Char.IsDigit(barcode[i]);
-        }
-
-        if (ok)
-        {
-            // Console.WriteLine(Barcode);
-            string prefix = new('0', Math.Max(0, 5 - barcode.Length));
-            barcode = prefix + barcode;
-        }
-
-        return barcode;
-    }
-
     private string PrehandleBarcode(string barcode)
     {
         if (Globals.Config.AutoCapitalize)
@@ -117,19 +100,14 @@ public class StocktakeController : ControllerBase
 
         if (Globals.Config.AutoZero)
         {
-            // Console.WriteLine("OK");
-            if (barcode.Length < 5)
+            Match match = _trimmedBarcodeRegexPattern.Match(barcode);
+            if (match.Success)
             {
-                barcode = Zeroify(barcode);
-            }
-            else if (barcode.First() == 'C' && barcode.Length < 6)
-            {
-                // Console.WriteLine(Barcode);
-                barcode = 'C' + Zeroify(barcode[1..]);
-                // File.AppendAllText("files\\zeros.txt", Barcode + '\n');
+                barcode = match.Groups[1].Value + match.Groups[2].Value.PadLeft(5, '0');
             }
         }
 
+        Serilog.Log.Information(barcode);
         return barcode;
     }
 
