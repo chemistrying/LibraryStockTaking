@@ -84,7 +84,7 @@ export default {
     },
     mounted() {
         const domain = window.location.host.split(":")[0];
-        this.apiUrl = `http://${domain}`;
+        this.apiUrl = `http://${domain}:8080/${domain}:5000`;
 
         this.$nextTick(() => {
             window.addEventListener('resize', this.onResize);
