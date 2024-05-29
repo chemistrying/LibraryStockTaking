@@ -3,7 +3,7 @@
         <div class="col-lg-3">
             <div class="card bg-primary-subtle border border-primary-subtle" style="auto">
             <div class="card-body">
-                <h4 class="card-title"> {{  session.sessionName }} </h4>
+                <h4 class="card-title"> {{ session.sessionName }} </h4>
                 <p class="card-subtitle text-body-secondary"> #{{ session.id }} </p>
                 <p class="card-subtitle text-body-secondary mt-1"> {{ session.description }} </p>
                 <p class="card-text text-body-secondary"> Start Time: {{ this.$root.readableTime(session.startDate) }} </p>
