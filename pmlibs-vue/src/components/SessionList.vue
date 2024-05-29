@@ -1,4 +1,7 @@
 <template>
+    <div class="container text-center">
+        <h3> Current Acitve Session: </h3>
+    </div>
     <div class="container">
         <div class="row row-cols-1 row-cols-lg-3 justify-content-lg-center g-4">
             <div class="col" v-for="session in this.$root.allSessionsInfo">
