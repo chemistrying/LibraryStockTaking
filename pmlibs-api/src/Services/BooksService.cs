@@ -22,7 +22,7 @@ public class BooksService
         _booksCollection.DeleteMany(_ => true);
 
         List<Book> initBooklist = [];
-        using (StreamReader sr = new StreamReader("files\\booklist.txt")!)
+        using (StreamReader sr = new StreamReader(Path.Combine(Globals.Config.DefaultProgramFilesLocation, "booklist.txt")!))
         {
             sr.ReadLine();
             while (!sr.EndOfStream)
