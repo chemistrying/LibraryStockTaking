@@ -107,7 +107,7 @@ public class StocktakeController : ControllerBase
             }
         }
 
-        Serilog.Log.Information(barcode);
+        // Serilog.Log.Information(barcode);
         return barcode;
     }
 
