@@ -17,6 +17,8 @@ services:
     container_name: api_container
     depends_on:
       - mongodb
+    links:
+      - mongodb
     ports:
       - '5000:5000'
   cors:
