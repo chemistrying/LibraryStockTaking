@@ -2,8 +2,8 @@ services:
   mongodb:
     image: mongo
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=user
-      - MONGO_INITDB_ROOT_PASSWORD=pass
+      - MONGO_INITDB_ROOT_USERNAME=${PMLIBS_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${PMLIBS_PASSWORD}
     volumes:
       - './database/data:/data/db'
     ports:
@@ -15,7 +15,7 @@ services:
       args:
         DOMAIN: ${DOMAIN}
     environment:
-      - CONNECTION_STRING=mongodb://user:pass@mongodb:27017/
+      - CONNECTION_STRING=mongodb://${PMLIBS_USERNAME}:${PMLIBS_PASSWORD}@mongodb:27017/
       - CONNECTION_DATABASE=library
     container_name: api_container
     depends_on:
