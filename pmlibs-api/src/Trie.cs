@@ -68,7 +68,16 @@ public class Trie
         int currIndex = 0;
         for (int i = 0; i < word.Length; i++)
         {
-            currIndex = _nodeArray[currIndex].Children[word[i]];
+            // check if the key exists before going to that node
+            if (_nodeArray[currIndex].Children.ContainsKey(word[i]))
+            {
+                currIndex = _nodeArray[currIndex].Children[word[i]];
+            }
+            else
+            {
+                // immediately return 0 (impossible to go deeper)
+                return 0;
+            }
         }
 
         return _nodeArray[currIndex].Count;
