@@ -19,8 +19,7 @@ export default {
     data() {
         return {
             activePage: 0, // 0 = root, 1 = whole session, 2 = bookshelf group, 3 = bookshelf
-            // apiUrl: "http://camistryin.ddns.net:8080/http://camistryin.ddns.net:5052/",
-            apiUrl: "",
+            apiUrl: `http://${window.location.host.split(":")[0]}:8080/${window.location.host.split(":")[0]}:5000`,
             sessionId: null,
             bookshelfGroup: null,
             bookshelfId: null,
@@ -83,9 +82,6 @@ export default {
         }
     },
     mounted() {
-        const domain = window.location.host.split(":")[0];
-        this.apiUrl = `http://${domain}:8080/${domain}:5000`;
-
         this.$nextTick(() => {
             window.addEventListener('resize', this.onResize);
         })
