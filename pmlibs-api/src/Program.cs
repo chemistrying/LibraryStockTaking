@@ -1,8 +1,27 @@
 using Serilog;
-
 using LibrarySystemApi.Services;
+using LibrarySystemApi.Models;
+
+LoggerConfiguration loggerConfiguration = new LoggerConfiguration().WriteTo.Console();
+
+switch (Globals.Config.LoggingLevel)
+{
+    case "Verbose":
+        loggerConfiguration.MinimumLevel.Verbose();
+        break;
+    case "Debug":
+        loggerConfiguration.MinimumLevel.Debug();
+        break;
+    default:
+        loggerConfiguration.MinimumLevel.Information();
+        break;
+}
+
+Log.Logger = loggerConfiguration.CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddSerilog();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -15,9 +34,6 @@ builder.Services.AddSingleton(new BooksService("books"));
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 
-Log.Logger = new LoggerConfiguration()
-    .WriteTo.Console()
-    .CreateLogger();
 
 var app = builder.Build();
 
