@@ -1,12 +1,7 @@
 <template>
-    <a 
-        class="nav-link" 
-        :class="activeClasses"
-        aria-current="page"
-        :href="page.link.url" 
-        :title="`This link goes to the ${page.link.text.toLowerCase()} page`"
-        >
-        {{page.link.text}}
+    <a class="nav-link" :class="activeClasses" aria-current="page" :href="page.link.url"
+        :title="`This link goes to the ${page.link.text.toLowerCase()} page`">
+        {{ page.link.text }}
     </a>
 </template>
 

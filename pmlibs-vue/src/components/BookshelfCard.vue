@@ -4,13 +4,15 @@
             <h4 class="card-text"> {{ bookshelf.groupName + '-' + bookshelf.shelfNumber }} </h4>
             <p class="card-subtitle text-body-secondary"> #{{ bookshelf.id }} </p>
             <p class="card-subtitle text-body-secondary"> {{ bookshelf.description }} </p>
-            <p class="card-text"> 
-                Status: 
+            <p class="card-text">
+                Status:
                 <span class="badge rounded-pill bg-danger" v-if="bookshelf.status == 0"> Not yet started </span>
-                <span class="badge rounded-pill bg-warning" v-if="bookshelf.status == 1 || bookshelf.status == 2"> In progress </span>
+                <span class="badge rounded-pill bg-warning" v-if="bookshelf.status == 1 || bookshelf.status == 2"> In
+                    progress </span>
                 <span class="badge rounded-pill bg-success" v-if="bookshelf.status == 3"> Finished </span>
             </p>
-            <button href="#" class="btn mt-2" :class="buttonClass" @click.prevent="jumpToBookshelf()"> {{ this.enterButtonText() }} </button>
+            <button href="#" class="btn mt-2" :class="buttonClass" @click.prevent="jumpToBookshelf()"> {{
+                this.enterButtonText() }} </button>
         </div>
     </div>
 </template>

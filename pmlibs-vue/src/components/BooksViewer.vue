@@ -32,7 +32,7 @@ export default {
         BookCard
     },
     data() {
-        
+
     },
     mounted() {
         console.log(this.bookshelf.allBooks);

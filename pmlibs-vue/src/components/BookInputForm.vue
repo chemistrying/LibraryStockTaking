@@ -7,18 +7,24 @@
     <form>
         <div class="row g-4 mb-3 row-cols-1 row-cols-lg-5">
             <div class="col">
-                <input type="text" v-model="prefix" class="form-control" :disabled="formDisableClass" placeholder="Prefix Format" aria-label="Prefix Format">
+                <input type="text" v-model="prefix" class="form-control" :disabled="formDisableClass"
+                    placeholder="Prefix Format" aria-label="Prefix Format">
             </div>
             <div class="col">
-                <input type="text" v-model="suffix" class="form-control" :disabled="formDisableClass" placeholder="Suffix Format" aria-label="Suffix Format">
+                <input type="text" v-model="suffix" class="form-control" :disabled="formDisableClass"
+                    placeholder="Suffix Format" aria-label="Suffix Format">
             </div>
             <div class="col">
-                <input type="text" v-model="barcode" class="form-control" :disabled="formDisableClass" placeholder="Barcode" aria-label="Last name">
+                <input type="text" v-model="barcode" class="form-control" :disabled="formDisableClass"
+                    placeholder="Barcode" aria-label="Last name">
             </div>
             <div class="col">
-                <button type="submit" class="d-flex h-100 align-items-center btn btn-primary" :class="activeClass" @click.prevent="stocktakeBook">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check" viewBox="0 0 16 16">
-                        <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425z"/>
+                <button type="submit" class="d-flex h-100 align-items-center btn btn-primary" :class="activeClass"
+                    @click.prevent="stocktakeBook">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                        class="bi bi-check" viewBox="0 0 16 16">
+                        <path
+                            d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425z" />
                     </svg>
                 </button>
             </div>

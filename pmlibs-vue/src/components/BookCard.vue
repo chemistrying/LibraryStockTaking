@@ -16,8 +16,9 @@
             
         </div>
     </div> -->
-    
-    <button class="accordion-button" :class="Object.assign({}, bookCardClass, { collapsed: !isActive })" type="button" data-bs-toggle="collapse" :aria-expanded="isActive" @click.prevent="toggleMessage">
+
+    <button class="accordion-button" :class="Object.assign({}, bookCardClass, { collapsed: !isActive })" type="button"
+        data-bs-toggle="collapse" :aria-expanded="isActive" @click.prevent="toggleMessage">
         <div class="row row-cols-1 row-cols-md-auto">
             <div class="col">
                 <p class="card-text"> Input Time: {{ readableTime(book.inputTime) }} </p>
@@ -28,20 +29,26 @@
             <div class="col" v-if="book.returnedResponse.verdict == 'error'">
                 <p class="card-text"> {{ book.barcode }} | ??? | ??? | ??? | ??? | ??? | ??? | ??? | ??? </p>
             </div>
-        </div>            
+        </div>
     </button>
-    <div class="accordion-collapse bg-light" :class="{ collapse: !isActive, show: isActive }" data-bs-parent="#accordionBooks">
+    <div class="accordion-collapse bg-light" :class="{ collapse: !isActive, show: isActive }"
+        data-bs-parent="#accordionBooks">
         <div class="accordion-body">
             <p class="text-secondary">
                 Result:
-                <span class="badge rounded-pill" :class="badgeClass"> {{ book.returnedResponse.verdict.toProperCase() }}</span>
+                <span class="badge rounded-pill" :class="badgeClass"> {{ book.returnedResponse.verdict.toProperCase()
+                    }}</span>
             </p>
             <p class="text-secondary"> Message: {{ book.returnedResponse.message }} </p>
             <!-- <p class="text-secondary"> {{ book.returnedResponse }} </p> -->
-            <button type="submit" class="d-flex h-100 align-items-center btn btn-danger" :disabled="bookshelf.status == 3" @click.prevent="deleteEntry">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
-                    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
-                    <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+            <button type="submit" class="d-flex h-100 align-items-center btn btn-danger"
+                :disabled="bookshelf.status == 3" @click.prevent="deleteEntry">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash"
+                    viewBox="0 0 16 16">
+                    <path
+                        d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z" />
+                    <path
+                        d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z" />
                 </svg>
             </button>
         </div>
@@ -51,7 +58,7 @@
 <script>
 String.prototype.toProperCase = function () {
     // https://stackoverflow.com/questions/196972/convert-string-to-title-case-with-javascript
-    return this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+    return this.replace(/\w\S*/g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
 };
 
 export default {

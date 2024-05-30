@@ -6,9 +6,12 @@
                     <h4 class="card-title"> {{ session.sessionName }} </h4>
                     <p class="card-subtitle text-body-secondary"> #{{ session.id }} </p>
                     <p class="card-subtitle text-body-secondary mt-1"> {{ session.description }} </p>
-                    <p class="card-text text-body-secondary"> Start Time: {{ this.$root.readableTime(session.startDate) }} </p>
+                    <p class="card-text text-body-secondary">
+                        Start Time: {{ this.$root.readableTime(session.startDate) }}
+                    </p>
                     <p class="card-text"> Total Progress: </p>
-                    <div class="progress" role="progressbar" aria-label="Basic example 20px high" :aira-valuenow=progress aria-valuemin="0" aria-valuemax="100">
+                    <div class="progress" role="progressbar" aria-label="Basic example 20px high"
+                        :aira-valuenow=progress aria-valuemin="0" aria-valuemax="100">
                         <div class="progress-bar" role="progressbar" :style="`width: ${progress}%`"></div>
                     </div>
                     <div class="row g-1 mt-1">
@@ -47,7 +50,7 @@ export default {
     data() {
         return {
             progress: 50,
-            bookshelves: []         
+            bookshelves: []
         }
     },
     methods: {

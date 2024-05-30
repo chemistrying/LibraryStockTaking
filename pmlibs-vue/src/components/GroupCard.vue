@@ -4,7 +4,8 @@
             <h4 class="card-title"> {{ group.groupName }} </h4>
             <p class="card-text"> Number of bookshelves: {{ group.allBookshelvesId.length }} </p>
             <h5 class="card-text"> Progress: </h5>
-            <div class="progress" role="progressbar" aria-label="Basic example 20px high" :aira-valuenow=progress aria-valuemin="0" aria-valuemax="100">
+            <div class="progress" role="progressbar" aria-label="Basic example 20px high" :aira-valuenow=progress
+                aria-valuemin="0" aria-valuemax="100">
                 <div class="progress-bar" role="progressbar" :style="`width: ${progress}%`"></div>
             </div>
             <button href="#" class="btn btn-primary mt-2" @click.prevent="jumpToGroup()"> Enter </button>
@@ -20,7 +21,7 @@ export default {
     },
     data() {
         return {
-            progress: 50          
+            progress: 50
         }
     },
     methods: {

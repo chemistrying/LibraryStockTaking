@@ -1,15 +1,16 @@
 <template>
     <div class="card h-100 w-100" style="auto">
-    <!-- <img src="..." class="card-img-top" alt="..."> -->
-    <div class="card-body text-center">
-        <h5 class="card-title"> {{ session.sessionName }} </h5>
-        <p class="card-text"> {{ session.description }} </p>
-        <!-- <p class="card-text"> #{{ session.id }}</p> -->
-        <a href="#" class="btn btn-primary" :class="{ disabled: !session.isActive }" @click.prevent="jumpToSession(this.session)"> Enter </a>
-    </div>
-    <div class="card-footer text-body-secondary">
-        Start Time: {{ this.$root.readableTime(session.startDate) }}
-    </div>
+        <!-- <img src="..." class="card-img-top" alt="..."> -->
+        <div class="card-body text-center">
+            <h5 class="card-title"> {{ session.sessionName }} </h5>
+            <p class="card-text"> {{ session.description }} </p>
+            <!-- <p class="card-text"> #{{ session.id }}</p> -->
+            <a href="#" class="btn btn-primary" :class="{ disabled: !session.isActive }"
+                @click.prevent="jumpToSession(this.session)"> Enter </a>
+        </div>
+        <div class="card-footer text-body-secondary">
+            Start Time: {{ this.$root.readableTime(session.startDate) }}
+        </div>
     </div>
 </template>
 

@@ -10,7 +10,7 @@ import Navbar from './components/Navbar.vue';
 export default {
     // dynamic values = computed
     computed: {
-        
+
     },
     components: {
         PageViewer, Navbar
@@ -39,22 +39,22 @@ export default {
             windowWidth: window.innerWidth,
             pages: [
                 {
-                    link: {text: 'Home', url: 'index.html'},
+                    link: { text: 'Home', url: 'index.html' },
                     pageTitle: 'Home Page',
                     content: 'This is the home content'
                 },
                 {
-                    link: {text: 'Session', url: 'session.html'},
+                    link: { text: 'Session', url: 'session.html' },
                     pageTitle: 'Session Page',
                     content: 'This is the session content'
                 },
                 {
-                    link: {text: 'Bookshelf Group', url: 'group.html'},
+                    link: { text: 'Bookshelf Group', url: 'group.html' },
                     pageTitle: 'Bookshelf Group Page',
                     content: 'This is the bookshelf group content'
                 },
                 {
-                    link: {text: 'Bookshelf', url: 'bookshelf.html'},
+                    link: { text: 'Bookshelf', url: 'bookshelf.html' },
                     pageTitle: 'Bookshelf Page',
                     content: 'This is the bookshelf content'
                 }
