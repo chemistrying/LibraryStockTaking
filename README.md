@@ -20,7 +20,7 @@ If you want certain development build, you may want to switch to another branch.
 3. If you have never used docker compose before, you may want to add permissions first
 ```sh
 # https://stackoverflow.com/questions/68653051/using-docker-compose-without-sudo-doesnt-work
-sudo usermod -aG docker $USE
+sudo usermod -aG docker $USER
 newgrp docker
 ```
 4. Run using docker compose
