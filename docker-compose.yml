@@ -38,6 +38,6 @@ services:
       dockerfile: Dockerfile
     container_name: vue_app_container
     ports:
-      - '3000:3000'
+      - '80:80'
       
     
