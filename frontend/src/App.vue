@@ -19,7 +19,6 @@ export default {
     data() {
         return {
             activePage: 0, // 0 = root, 1 = whole session, 2 = bookshelf group, 3 = bookshelf
-            apiUrl: `http://${window.location.host.split(":")[0]}`,
             sessionId: null,
             bookshelfGroup: null,
             bookshelfId: null,
