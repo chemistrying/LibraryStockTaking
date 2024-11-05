@@ -1,4 +1,4 @@
-# libraryStockTaking
+# LibraryStockTaking
 
 ## Features of the Program:  
 * Provides formatting to input to reduce inputting time
