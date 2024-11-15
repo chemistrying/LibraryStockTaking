@@ -1,9 +1,11 @@
 using LibrarySystemApi.Models;
 using LibrarySystemApi.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LibrarySystemApi.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class ProgressController : ControllerBase

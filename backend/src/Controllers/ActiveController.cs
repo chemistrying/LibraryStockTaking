@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using LibrarySystemApi.Models;
 using LibrarySystemApi.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -21,6 +22,7 @@ public class ActiveController : ControllerBase
     public async Task<ActionResult<StockTakingSession?>> Get() =>
         await _sessionsService.GetActiveAsync();
 
+    [Authorize(Policy = "AdminOnly")]
     [HttpPost("{id:length(24)}")]
     public async Task<IActionResult> Post(string id)
     {

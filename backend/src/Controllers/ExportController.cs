@@ -1,10 +1,12 @@
 using System.IO.Compression;
 using LibrarySystemApi.Models;
 using LibrarySystemApi.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LibrarySystemApi.Controllers;
 
+[Authorize(Policy = "AdminOnly")]
 [ApiController]
 [Route("api/[controller]")]
 public class ExportController : ControllerBase

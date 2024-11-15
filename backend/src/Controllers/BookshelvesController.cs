@@ -1,9 +1,11 @@
 using LibrarySystemApi.Models;
 using LibrarySystemApi.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LibrarySystemApi.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class BookshelvesController : ControllerBase
@@ -45,7 +47,8 @@ public class BookshelvesController : ControllerBase
     }
 
     [HttpGet("{sessionId:length(24)}/{groupName}")]
-    public async Task<ActionResult<List<Bookshelf>>> GetByGroup(string sessionId, string groupName) {
+    public async Task<ActionResult<List<Bookshelf>>> GetByGroup(string sessionId, string groupName)
+    {
         var session = await _sessionsService.GetAsync(sessionId);
 
         // check if the session exists and the session is active or not
@@ -67,6 +70,7 @@ public class BookshelvesController : ControllerBase
         return bookshelves;
     }
 
+    [Authorize(Policy = "AdminOnly")]
     [HttpPost]
     public async Task<IActionResult> Post(string sessionId, string groupName)
     {
@@ -80,14 +84,14 @@ public class BookshelvesController : ControllerBase
         else if (!session.IsActive)
         {
             return StatusCode(StatusCodes.Status403Forbidden, "The session is currently inactive");
-        } 
-        
+        }
+
         var idx = session.AllBookshelfGroups.FindIndex(x => x.GroupName == groupName);
         // check if the group name exists or not
         if (idx == -1)
         {
             return NotFound();
-        } 
+        }
 
         var shelfNumber = session.AllBookshelfGroups[idx].AllBookshelvesId.Count + 1;
 
@@ -112,6 +116,7 @@ public class BookshelvesController : ControllerBase
         return CreatedAtAction(nameof(Get), new { sessionId = sessionId, bookshelfId = newBookshelf.Id }, newBookshelf);
     }
 
+    [Authorize(Policy = "AdminOnly")]
     [HttpPut("{sessionId:length(24)}/{bookshelfId:length(24)}")]
     public async Task<IActionResult> Update(string sessionId, string bookshelfId, string description)
     {
