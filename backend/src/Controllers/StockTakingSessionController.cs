@@ -1,11 +1,13 @@
 using LibrarySystemApi.Models;
 using LibrarySystemApi.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 using Newtonsoft.Json;
 
 namespace LibrarySystemApi.Controllers;
 
+[Authorize(Policy = "AdminOnly")]
 [ApiController]
 [Route("api/[controller]")]
 public class SessionsController : ControllerBase
@@ -114,25 +116,25 @@ public class SessionsController : ControllerBase
 
         return Ok();
     }
+    
+    [HttpDelete("{id:length(24)}")]
+    public async Task<IActionResult> Delete(string id)
+    {
+        var session = await _sessionsService.GetAsync(id);
 
-    // [HttpDelete("{id:length(24)}")]
-    // public async Task<IActionResult> Delete(string id)
-    // {
-    //     var session = await _sessionsService.GetAsync(id);
+        if (session is null)
+        {
+            return NotFound();
+        }
 
-    //     if (session is null)
-    //     {
-    //         return NotFound();
-    //     }
+        // remove bookshelves as well
+        foreach (BookshelfGroup bookshelfGroup in session.AllBookshelfGroups)
+        {
+            await _bookshelvesService.RemoveManyAsync(bookshelfGroup.GroupName);
+        }
 
-    //     // remove bookshelves as well
-    //     foreach (BookshelfGroup bookshelfGroup in session.AllBookshelfGroups)
-    //     {
-    //         await _bookshelvesService.RemoveManyAsync(bookshelfGroup.GroupName);
-    //     }
+        await _sessionsService.RemoveAsync(id);
 
-    //     await _sessionsService.RemoveAsync(id);
-
-    //     return NoContent();
-    // }
+        return NoContent();
+    }
 }
