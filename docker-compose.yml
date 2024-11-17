@@ -1,0 +1,36 @@
+services:
+  mongodb:
+    image: mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${PMLIBS_DATABASE_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${PMLIBS_DATABASE_PASSWORD}
+    volumes:
+      - './database/data:/data/db'
+    ports:
+      - '27017:27017'
+    command: --quiet
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        DOMAIN: ${DOMAIN}
+    environment:
+      - CONNECTION_STRING=mongodb://${PMLIBS_DATABASE_USERNAME}:${PMLIBS_DATABASE_PASSWORD}@mongodb:27017/
+      - CONNECTION_DATABASE=library
+    depends_on:
+      - mongodb
+    links:
+      - mongodb
+    ports:
+      - '5000:5000'
+  app:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    links:
+      - api
+    ports:
+      - '80:80'
+      
+    

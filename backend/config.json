@@ -1,0 +1,9 @@
+{
+    "DefaultSaveLocation": "exports",
+    "DefaultProgramFilesLocation": "files",
+    "LoggingLevel": "Information",
+    "Version": "4.0.0",
+    "AutoCapitalize": true,
+    "AutoZero": true,
+    "BookshelfTreeProfile": 0
+}
