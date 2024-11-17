@@ -90,7 +90,7 @@ export default {
             window.addEventListener('resize', this.onResize);
         })
 
-        this.isAdmin = await fetch(`${this.$root.$apiUrl}/api/admin`).then(response => response.status === 200);
+        this.isAdmin = await fetch(`${this.$root.apiUrl}/api/admin`).then(response => response.status === 200);
 
         console.log(this.apiUrl);
 
