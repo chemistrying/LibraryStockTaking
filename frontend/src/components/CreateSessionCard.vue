@@ -31,7 +31,7 @@ export default {
                 'sessionName': this.sessionName,
                 'description': this.description
             }
-            var response = await fetch(`${this.$root.apiUrl}/api/session`, {
+            var response = await fetch(`${this.$root.apiUrl}/api/sessions`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -42,7 +42,7 @@ export default {
             if (response.status == 201) {
                 // redirect
                 this.$parent.failed = false;
-                var sessionId = response.json().id;
+                var sessionId = await response.json().then(session => session.id);
                 this.$parent.message = `You have successfully created a session with id "${sessionId}".`;
             } else {
                 this.$parent.failed = true;
