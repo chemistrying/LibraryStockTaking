@@ -48,7 +48,7 @@ builder.Services.AddAuthentication(options =>
 .AddCookie(options =>
 {
     options.LoginPath = "/api/Login";
-    options.LogoutPath = "api/Logout";
+    options.LogoutPath = "/api/Logout";
     options.AccessDeniedPath = "/api/Login";
 });
 
