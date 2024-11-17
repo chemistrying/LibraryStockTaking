@@ -1,6 +1,8 @@
 <template>
-    <navbar :pages="pages" :activePage="activePage" :nav-link-click="(index) => activePage = index"></navbar>
-    <page-viewer :page="pages[activePage]"></page-viewer>
+    <div v-if="loaded">
+        <navbar :pages="pages" :activePage="activePage" :nav-link-click="(index) => activePage = index"></navbar>
+        <page-viewer :page="pages[activePage]"></page-viewer>
+    </div>
 </template>
 
 <script>
@@ -25,6 +27,7 @@ export default {
             bookshelfId: null,
             isAdmin: false,
             user: null,
+            loaded: false,
             appPage: {
                 ROOT: 0,
                 SESSION: 1,
@@ -86,15 +89,20 @@ export default {
         }
     },
     async mounted() {
+        this.loaded = false;
         this.$nextTick(() => {
             window.addEventListener('resize', this.onResize);
         })
 
         this.isAdmin = await fetch(`${this.$root.apiUrl}/api/admin`).then(response => response.status === 200);
 
+        this.user = await fetch(`${this.$root.apiUrl}/api/account`).then(response => response.text()).then(text => text === '' ? null : text);
+
         console.log(this.apiUrl);
 
         console.log(`Copyright chemistrying 2024. Version ${this.version}.`)
+
+        this.loaded = true;
     }
 }
 </script>
