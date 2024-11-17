@@ -17,7 +17,7 @@
                 <textarea v-model="description" class="form-control" id="descriptionInput"
                     placeholder="Description" rows="3"></textarea>
             </div>
-            <a href="#head" type="button" class="btn btn-primary" @click="createSession()">Create</a>
+            <a href="#head" type="button" class="btn btn-primary" @click="updateSession()">Create</a>
         </div>
     </div>
 </template>
@@ -26,18 +26,19 @@
 export default {
     data() {
         return {
+            sessionId: '',
             sessionName: '',
             description: '',
             sessionId: ''
         }
     },
     methods: {
-        async createSession() {
+        async updateSession() {
             var data = {
                 'sessionName': this.sessionName === '' ? null : this.sessionName,
-                'description': this.description === '' ? null : this.sessionName
+                'description': this.description === '' ? null : this.description
             }
-            var response = await fetch(`${this.$root.apiUrl}/api/session/${this.sessionId}`, {
+            var response = await fetch(`${this.$root.apiUrl}/api/sessions/${this.sessionId}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -48,7 +49,7 @@ export default {
             if (response.status === 200) {
                 // redirect
                 this.$parent.failed = false;
-                this.$parent.message = `You have successfully changed information for session "${sessionId}".`;
+                this.$parent.message = `You have successfully changed information for session "${this.sessionId}".`;
             } else if (response.status === 404) {
                 this.$parent.failed = true;
                 this.$parent.message = `Invalid session ID.`;
