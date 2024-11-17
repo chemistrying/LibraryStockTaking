@@ -49,7 +49,7 @@ builder.Services.AddAuthentication(options =>
 {
     options.LoginPath = "/api/Login";
     options.LogoutPath = "api/Logout";
-    options.AccessDeniedPath = "/api";
+    options.AccessDeniedPath = "/api/Login";
 });
 
 builder.Services.AddAuthorization(options =>
