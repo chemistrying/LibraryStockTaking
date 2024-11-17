@@ -1,16 +1,21 @@
 <template>
-    <div class="container">
-        <div
-            class="container-fluid text-center mt-5 mb-5 pt-4 pb-4 bg-light-subtle border border-light-subtle rounded-3">
-            <div class="row">
-                <h1> {{ page.pageTitle }} </h1>
-            </div>
-            <div class="row">
-                <p> {{ page.content }} </p>
-            </div>
-        </div>
+    <div class="container" id="head">
         <Transition>
-            <session-list v-if="this.$root.activePage == this.$root.appPage.ROOT"></session-list>
+            <div
+                v-if="this.$root.activePage >= 0" class="container-fluid text-center mt-5 mb-5 pt-4 pb-4 bg-light-subtle border border-light-subtle rounded-3">
+                <div class="row">
+                    <h1> {{ page.pageTitle }} </h1>
+                </div>
+                <div class="row">
+                    <p> Hi, {{ this.$root.user === null ? "Annonymous" : this.$root.user }}. Hope you have a nice day. </p>
+                </div>
+            </div>
+        </Transition>
+        <Transition>
+            <panel-viewer v-if="this.$root.activePage === this.$root.appPage.PANEL"></panel-viewer>
+        </Transition>
+        <Transition>
+            <session-list v-if="this.$root.activePage === this.$root.appPage.ROOT"></session-list>
         </Transition>
         <Transition>
             <session-viewer :session="retreiveCurrentSession()"
@@ -44,11 +49,12 @@ import SessionList from './SessionList.vue'
 import SessionViewer from './SessionViewer.vue'
 import BookshelfGroupViewer from './BookshelfGroupViewer.vue'
 import BookshelfViewer from './BookshelfViewer.vue'
+import PanelViewer from './PanelViewer.vue'
 
 export default {
     // props: camelCase!
     components: {
-        SessionList, SessionViewer, BookshelfGroupViewer, BookshelfViewer
+        SessionList, SessionViewer, BookshelfGroupViewer, BookshelfViewer, PanelViewer
     },
     props: ['page'],
     methods: {
@@ -60,7 +66,6 @@ export default {
 </script>
 
 <style>
-/* we will explain what these classes do next! */
 .v-enter-active {
     transition: all 1s ease;
 }

@@ -18,15 +18,19 @@ export default {
     // static data
     data() {
         return {
+            apiUrl: '',
             activePage: 0, // 0 = root, 1 = whole session, 2 = bookshelf group, 3 = bookshelf
             sessionId: null,
             bookshelfGroup: null,
             bookshelfId: null,
+            isAdmin: false,
+            user: null,
             appPage: {
                 ROOT: 0,
                 SESSION: 1,
                 GROUP: 2,
-                BOOKSHELF: 3
+                BOOKSHELF: 3,
+                PANEL: -1
             },
             operations: {
                 ADD: "add",
@@ -81,10 +85,12 @@ export default {
             this.windowWidth = window.innerWidth
         }
     },
-    mounted() {
+    async mounted() {
         this.$nextTick(() => {
             window.addEventListener('resize', this.onResize);
         })
+
+        this.isAdmin = await fetch(`${this.$root.$apiUrl}/api/admin`).then(response => response.status === 200);
 
         console.log(this.apiUrl);
 
