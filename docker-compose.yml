@@ -18,7 +18,6 @@ services:
     environment:
       - CONNECTION_STRING=mongodb://${PMLIBS_DATABASE_USERNAME}:${PMLIBS_DATABASE_PASSWORD}@mongodb:27017/
       - CONNECTION_DATABASE=library
-    container_name: api_container
     depends_on:
       - mongodb
     links:
@@ -29,7 +28,6 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: vue_app_container
     links:
       - api
     ports:
