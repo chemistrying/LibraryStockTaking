@@ -39,8 +39,10 @@ public class SessionsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Post(string sessionName, string description)
+    public async Task<IActionResult> Post(NewSessionModel newSessionModel)
     {
+        string sessionName = newSessionModel.SessionName, description = newSessionModel.Description;
+
         var pregenBookshelfGroups = new List<BookshelfGroup>();
 
         var bookshelfTreeProfile = JsonConvert.DeserializeObject<Dictionary<string, int>>(System.IO.File.ReadAllText(Path.Combine(Globals.Config.DefaultProgramFilesLocation, $"profile_v{Globals.Config.BookshelfTreeProfile}.json")))!;
@@ -100,7 +102,7 @@ public class SessionsController : ControllerBase
     }
 
     [HttpPut("{id:length(24)}")]
-    public async Task<IActionResult> Update(string id, string sessionName, string description)
+    public async Task<IActionResult> Update(string id, NewSessionModel newSessionModel)
     {
         var session = await _sessionsService.GetAsync(id);
 
@@ -109,8 +111,8 @@ public class SessionsController : ControllerBase
             return NotFound();
         }
 
-        session.SessionName = sessionName;
-        session.Description = description;
+        session.SessionName = newSessionModel.SessionName ?? session.SessionName;
+        session.Description = newSessionModel.Description ?? session.Description;
 
         await _sessionsService.UpdateAsync(id, session);
 
