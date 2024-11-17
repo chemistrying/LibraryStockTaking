@@ -2,7 +2,7 @@
     <nav :class="[`bg-${theme}`, `navbar-${theme}`, 'navbar', 'navbar-expand-lg']">
         <div class="container-fluid">
             <a class="navbar-brand" href="#" @click.prevent="returnHome">Poor Man's System</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll"
+            <button class="navbar-toggler pull-right" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll"
                 aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation"
                 @click.prevent="toggleNavbar()">
                 <span class="navbar-toggler-icon"></span>
@@ -15,14 +15,10 @@
 
                         </navbar-link>
                     </li>
-                    <li class="nav-item">
-
-                    </li>
                 </ul>
-
-
+                <button class="btn btn-primary pull-right" @click.preven="toPanelPage()"> {{ this.$root.user === null ? "Login" : "Panel" }} </button>
             </div>
-
+            
         </div>
     </nav>
 </template>
@@ -58,6 +54,9 @@ export default {
         },
         toggleNavbar() {
             this.navbarActive ^= 1;
+        },
+        toPanelPage() {
+            this.$root.activePage = this.$root.appPage.PANEL;
         }
     }
 }
