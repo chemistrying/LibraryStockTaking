@@ -58,7 +58,7 @@ public class AccountController : ControllerBase
     [HttpPut]
     public async Task<ActionResult<string?>> Put(AccountPayload accountPayload)
     {
-        var account = await _accountsService.GetAsync(accountPayload.OldName);
+        var account = await _accountsService.GetAsync(accountPayload.OldUsername);
 
         // check if the session exists and the session is active or not
         if (account is null)
@@ -68,10 +68,10 @@ public class AccountController : ControllerBase
 
         byte[] salt = PasswordHasher.GetSaltFromHash(account.PasswordHash);
 
-        if (await _accountsService.LoginAsync(accountPayload.OldName, PasswordHasher.HashPassword(accountPayload.OldPassword, salt)))
+        if (await _accountsService.LoginAsync(accountPayload.OldUsername, PasswordHasher.HashPassword(accountPayload.OldPassword, salt)))
         {
             // ok
-            account.Name = accountPayload.NewName ?? accountPayload.OldName;
+            account.Name = accountPayload.NewUsername ?? accountPayload.OldUsername;
             account.PasswordHash = accountPayload.NewPassword == null ? account.PasswordHash : PasswordHasher.HashPassword(accountPayload.NewPassword, PasswordHasher.GenerateSalt());
             
             await _accountsService.UpdateAsync(account.Name, account);

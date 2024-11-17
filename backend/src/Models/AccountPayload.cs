@@ -2,9 +2,9 @@ namespace LibrarySystemApi.Models;
 
 public class AccountPayload
 {
-    public string OldName { get; set; } = null!;
+    public string OldUsername { get; set; } = null!;
 
-    public string? NewName { get; set; }
+    public string? NewUsername { get; set; }
     
     public string OldPassword { get; set; } = null!;
 
