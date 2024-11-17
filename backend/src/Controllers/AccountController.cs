@@ -18,14 +18,19 @@ public class AccountController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<string?>> Post(string name, string password)
+    public async Task<ActionResult<string?>> Post(LoginModel loginModel)
     {
+        string name = loginModel.name, password = loginModel.password;
         var account = await _accountsService.GetAsync(name);
 
         // check if the session exists and the session is active or not
         if (account is not null)
         {
             return BadRequest("The username has already been used.");
+        } 
+        else if (name == "" || password == "")
+        {
+            return BadRequest("Username or password cannot be empty strings.");
         }
 
         Account newAccount = new()
