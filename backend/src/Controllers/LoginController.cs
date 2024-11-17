@@ -24,7 +24,7 @@ public class LoginController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> Get()
     {
-        return Unauthorized("You need higher privilege to access the API endpoints.");
+        return StatusCode(StatusCodes.Status403Forbidden, "You need higher privilege to access the API endpoints.");
     }
 
     [HttpPost]
