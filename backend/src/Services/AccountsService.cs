@@ -41,8 +41,8 @@ public class AccountsService
     public async Task CreateAsync(Account newAccount) =>
         await _accountsCollection.InsertOneAsync(newAccount);
 
-    public async Task UpdateAsync(string name, Account updatedAccount) =>
-        await _accountsCollection.ReplaceOneAsync(x => x.Name == name, updatedAccount);
+    public async Task UpdateAsync(string id, Account updatedAccount) =>
+        await _accountsCollection.ReplaceOneAsync(x => x.Id == id, updatedAccount);
 
     public async Task RemoveAsync(string name, string hash) =>
         await _accountsCollection.DeleteOneAsync(x => x.Name == name && x.PasswordHash == hash);
