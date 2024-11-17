@@ -31,7 +31,7 @@ export default {
                 'sessionName': this.sessionName,
                 'description': this.description
             }
-            var response = await fetch(`${this.$root.apiUrl}/api/session/`, {
+            var response = await fetch(`${this.$root.apiUrl}/api/session`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
