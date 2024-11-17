@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LibrarySystemApi.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class ActiveController : ControllerBase
