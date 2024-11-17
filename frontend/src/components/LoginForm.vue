@@ -50,7 +50,7 @@ export default {
             if (response.status == 200) {
                 // redirect
                 this.failed = false;
-                this.user = username;
+                this.user = this.username;
                 this.$root.activePage = this.$root.appPage.ROOT;
             } else if (response.status == 401) {
                 this.failed = true;
@@ -78,7 +78,7 @@ export default {
                 this.$root.activePage = this.$root.appPage.ROOT;
             } else if (response.status == 400) {
                 this.failed = true;
-                this.failedMessage = response.text();
+                this.failedMessage = await response.text();
             } else {
                 this.failed = true;
                 this.failedMessage = "Server error. Please try again later.";
