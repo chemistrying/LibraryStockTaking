@@ -1,6 +1,8 @@
 using LibrarySystemApi.Models;
 using LibrarySystemApi.Services;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LibrarySystemApi.Controllers;
 
@@ -17,10 +19,17 @@ public class AccountController : ControllerBase
         _tokensService = tokensService;
     }
 
+    [HttpGet]
+    public async Task<ActionResult<string?>> Get()
+    {
+        return HttpContext.User.FindFirstValue(ClaimTypes.Name);
+    }
+
+    [AllowAnonymous]
     [HttpPost]
     public async Task<ActionResult<string?>> Post(LoginModel loginModel)
     {
-        string name = loginModel.name, password = loginModel.password;
+        string name = loginModel.username, password = loginModel.password;
         var account = await _accountsService.GetAsync(name);
 
         // check if the session exists and the session is active or not
