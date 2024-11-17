@@ -21,7 +21,7 @@ export default {
     },
     methods: {
         async selectActiveSession() {
-            var response = await fetch(`${this.$root.apiUrl}/api/active/${this.sessionid}`, {
+            var response = await fetch(`${this.$root.apiUrl}/api/active/${this.sessionId}`, {
                 method: "POST"
             });
 
