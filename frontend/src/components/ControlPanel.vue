@@ -12,6 +12,9 @@
         <div class="col">
             <credentials-card class="mt-3"></credentials-card>
         </div>
+        <div class="col">
+            <logout-card></logout-card>
+        </div>
         <!-- Admin Cards -->
         <div class="col" v-if="this.$root.isAdmin">
             <!-- Select Active Session -->
@@ -40,11 +43,12 @@ import ActiveCard from './ActiveCard.vue';
 import CreateSessionCard from './CreateSessionCard.vue';
 import ChangeSessionCard from './ChangeSessionCard.vue';
 import ReloadBooklistCard from './ReloadBooklistCard.vue';
+import LogoutCard from './LogoutCard.vue';
 
 export default {
     props: ['isAdmin'],
     components: {
-        CredentialsCard, SessionList, ActiveCard, CreateSessionCard, ChangeSessionCard, ReloadBooklistCard
+        CredentialsCard, SessionList, ActiveCard, CreateSessionCard, ChangeSessionCard, ReloadBooklistCard, LogoutCard
     },
     computed: {
         failureClass() {

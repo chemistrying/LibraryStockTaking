@@ -19,6 +19,9 @@ export default {
             if (response.status == 200) {
                 // redirect
                 this.$parent.failed = false;
+                this.$root.isAdmin = false;
+                this.$root.user = null;
+                this.$root.allSessionsInfo = {};
                 this.$root.activePage = this.$root.appPage.ROOT;
             } else {
                 this.$parent.failed = true;
