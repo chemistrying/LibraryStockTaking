@@ -27,10 +27,11 @@ public class LoginController : ControllerBase
         return StatusCode(StatusCodes.Status403Forbidden, "You need higher privilege to access the API endpoints.");
     }
 
+    [AllowAnonymous]
     [HttpPost]
     public async Task<IActionResult> Post(LoginModel loginModel)
     {
-        string name = loginModel.name, password = loginModel.password;
+        string name = loginModel.username, password = loginModel.password;
 
         var account = await _accountsService.GetAsync(name);
 
