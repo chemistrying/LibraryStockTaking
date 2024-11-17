@@ -13,7 +13,7 @@ export default {
             return {
                 active: this.isActive,
                 emphasize: this.isActive,
-                disabled: this.pageIndex > this.$root.activePage
+                disabled: this.pageIndex > Math.max(0, this.$root.activePage)
             }
         }
     }
