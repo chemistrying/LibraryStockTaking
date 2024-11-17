@@ -66,6 +66,16 @@ public class AccountController : ControllerBase
             return BadRequest("The account doesn't exist.");
         }
 
+        // check duplication
+        if (accountPayload.NewUsername is not null)
+        {
+            var testAccount = await _accountsService.GetAsync(accountPayload.NewUsername);
+            if (testAccount is not null)
+            {
+                return BadRequest("The new username already exists.");
+            }
+        }
+
         byte[] salt = PasswordHasher.GetSaltFromHash(account.PasswordHash);
 
         if (await _accountsService.LoginAsync(accountPayload.OldUsername, PasswordHasher.HashPassword(accountPayload.OldPassword, salt)))
@@ -73,8 +83,8 @@ public class AccountController : ControllerBase
             // ok
             account.Name = accountPayload.NewUsername ?? accountPayload.OldUsername;
             account.PasswordHash = accountPayload.NewPassword == null ? account.PasswordHash : PasswordHasher.HashPassword(accountPayload.NewPassword, PasswordHasher.GenerateSalt());
-            
-            await _accountsService.UpdateAsync(account.Name, account);
+
+            await _accountsService.UpdateAsync(account.Id!, account);
 
             return Ok();
         }
