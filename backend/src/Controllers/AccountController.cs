@@ -2,6 +2,8 @@ using LibrarySystemApi.Models;
 using LibrarySystemApi.Services;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 
 namespace LibrarySystemApi.Controllers;
@@ -52,6 +54,16 @@ public class AccountController : ControllerBase
 
         await _accountsService.CreateAsync(newAccount);
 
+        var claims = new List<Claim>
+        {
+            // new Claim(ClaimTypes.NameIdentifier, token.Id!),
+            new Claim(ClaimTypes.Name, name),
+            new Claim(ClaimTypes.Role, "User")
+        };
+
+        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+
         return name;
     }
 
@@ -85,6 +97,16 @@ public class AccountController : ControllerBase
             account.PasswordHash = accountPayload.NewPassword == null ? account.PasswordHash : PasswordHasher.HashPassword(accountPayload.NewPassword, PasswordHasher.GenerateSalt());
 
             await _accountsService.UpdateAsync(account.Id!, account);
+
+            var claims = new List<Claim>
+            {
+                // new Claim(ClaimTypes.NameIdentifier, token.Id!),
+                new Claim(ClaimTypes.Name, account.Name),
+                new Claim(ClaimTypes.Role, account.IsAdmin ? "Administrator" : "User")
+            };
+
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
 
             return Ok();
         }
