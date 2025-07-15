@@ -25,6 +25,6 @@ public class LogoutController : ControllerBase
     {
         await HttpContext.SignOutAsync();
 
-        return Ok();
+        return Redirect("/");
     }
 }
